@@ -51,8 +51,8 @@
     display: flex; align-items: center; justify-content: center;
     font-weight: 800; font-size: 15px; flex-shrink: 0;
   }
-  .header-title { font-size: 15px; font-weight: 700; line-height: 1.2; }
-  .header-sub   { font-size: 10px; opacity: .7; }
+  .header-date-day  { font-size: 16px; font-weight: 900; line-height: 1.1; }
+  .header-date-full { font-size: 11px; opacity: .75; margin-top: 1px; }
   .header-worker { margin-left: auto; display: flex; align-items: center; gap: 10px; }
   .worker-av {
     width: 36px; height: 36px; border-radius: 50%;
@@ -169,8 +169,12 @@
   }
   .op-num-badge .n { font-size: 20px; font-weight: 900; line-height: 1; }
   .op-num-badge .l { font-size: 8px; opacity: .7; }
-  .op-title { font-size: 17px; font-weight: 800; color: var(--gray-900); line-height: 1.2; }
+  .op-title { font-size: 20px; font-weight: 900; color: var(--gray-900); line-height: 1.2; }
   .op-sub   { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+  .op-header-box {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; flex-shrink: 0;
+  }
   .op-desc-wrap {
     flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
   }
@@ -425,8 +429,8 @@
 <div class="header">
   <div class="logo">P</div>
   <div>
-    <div class="header-title">Varroda Feladatok</div>
-    <div class="header-sub" id="header-date">Betöltés...</div>
+    <div class="header-date-day" id="header-day">–</div>
+    <div class="header-date-full" id="header-date">Betöltés...</div>
   </div>
   <div class="header-worker">
     <div>
@@ -473,15 +477,15 @@
     <!-- COL 2: Műveleti adatok -->
     <div class="card">
       <div class="card-lbl">Műveleti adatok</div>
-      <div class="op-badge-row">
-        <div class="op-num-badge">
-          <span class="n" id="op-num">–</span>
-          <span class="l">Op.</span>
-        </div>
-        <div>
-          <div class="op-title" id="op-title">Betöltés...</div>
+      <div class="op-header-box">
+        <div class="op-badge-row" style="margin-bottom:6px;">
+          <div class="op-num-badge">
+            <span class="n" id="op-num">–</span>
+            <span class="l">Op.</span>
+          </div>
           <div class="op-sub" id="op-sub">M-22 · Push-up Triangle Bikini Top</div>
         </div>
+        <div class="op-title" id="op-title">Betöltés...</div>
       </div>
       <div class="op-desc-wrap">
         <div class="op-desc-row" id="desc-row-main" style="display:none">
@@ -607,8 +611,10 @@
 
   async function init() {
     const d = new Date();
+    document.getElementById('header-day').textContent =
+      d.toLocaleDateString('hu-HU', {weekday:'long'}).replace(/^./, c => c.toUpperCase());
     document.getElementById('header-date').textContent =
-      'Ma: ' + d.toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'});
+      d.toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'});
 
     // Termék kép betöltése API-ból
     try {
