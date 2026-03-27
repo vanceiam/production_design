@@ -514,19 +514,6 @@
           <div id="materials-list" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
       </div>
-      <div class="info-row">
-        <div class="info-pill purple">
-          <span class="pv" id="op-time">–</span>
-          <span class="pl">mp/db</span>
-        </div>
-        <div class="info-pill orange">
-          <span class="pv" id="op-qty">–</span>
-          <span class="pl">Darab</span>
-        </div>
-      </div>
-      <div class="video-indicator no-video" id="video-indicator">
-        ▶ Nincs videó ehhez a művelethez
-      </div>
     </div>
 
     <!-- COL 3: Idők & Méretek -->
@@ -747,9 +734,8 @@
     document.getElementById('op-desc-extra').textContent = extra;
 
     const timeSec = op.time_sec || 0;
-    document.getElementById('op-time').textContent = timeSec || '–';
+
     document.getElementById('time-val').textContent = timeSec || '–';
-    document.getElementById('op-qty').textContent = color.qty;
 
     recalcFromSizes();
 
@@ -776,7 +762,6 @@
     // Videó
     const driveId = op.video_drive_id;
     const videoWrap = document.getElementById('video-wrap');
-    const indicator = document.getElementById('video-indicator');
     if (driveId) {
       const localUrl = `/videos/${driveId}.mp4`;
       videoWrap.innerHTML = `<video
@@ -785,12 +770,8 @@
         controls autoplay muted playsinline
         onerror="this.parentElement.innerHTML='<div class=\\'no-video-wrap\\'><div class=\\'icon\\'>⚠️</div><div class=\\'txt\\'>Videó nem elérhető</div></div>'"
       ></video>`;
-      indicator.className = 'video-indicator has-video';
-      indicator.textContent = '▶ Videó betöltve';
     } else {
       videoWrap.innerHTML = `<div class="no-video-wrap"><div class="icon">🎬</div><div class="txt">Nincs videó</div></div>`;
-      indicator.className = 'video-indicator no-video';
-      indicator.textContent = '▶ Nincs videó ehhez a művelethez';
     }
 
     // Méretek – szerkeszthető inputok (customSizes-ből, megőrzi a módosításokat)
