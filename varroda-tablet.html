@@ -51,8 +51,10 @@
     display: flex; align-items: center; justify-content: center;
     font-weight: 800; font-size: 15px; flex-shrink: 0;
   }
-  .header-date-day  { font-size: 16px; font-weight: 900; line-height: 1.1; }
-  .header-date-full { font-size: 11px; opacity: .75; margin-top: 1px; }
+  .header-date-row  { display: flex; align-items: center; gap: 8px; }
+  .header-date-full { font-size: 18px; font-weight: 900; line-height: 1.1; }
+  .header-date-sep  { font-size: 16px; opacity: .4; font-weight: 300; }
+  .header-date-day  { font-size: 14px; font-weight: 600; opacity: .85; }
   .header-worker { margin-left: auto; display: flex; align-items: center; gap: 10px; }
   .worker-av {
     width: 36px; height: 36px; border-radius: 50%;
@@ -214,12 +216,14 @@
     border-radius: 8px; padding: 6px 8px;
   }
   .material-img {
-    width: 36px; height: 36px; border-radius: 6px;
+    width: 40px; height: 40px; border-radius: 6px;
     object-fit: cover; flex-shrink: 0;
     background: var(--gray-200);
   }
   .material-name { font-size: 12px; font-weight: 600; color: var(--gray-800); }
-  .material-amt  { font-size: 11px; color: var(--gray-400); }
+  .material-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+  .material-amt  { font-size: 20px; font-weight: 900; color: var(--purple); line-height: 1; }
+  .material-unit { font-size: 10px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; }
 
   /* Videó indikátor */
   .video-indicator {
@@ -428,9 +432,10 @@
 <!-- HEADER -->
 <div class="header">
   <div class="logo">P</div>
-  <div>
-    <div class="header-date-day" id="header-day">–</div>
+  <div class="header-date-row">
     <div class="header-date-full" id="header-date">Betöltés...</div>
+    <div class="header-date-sep">|</div>
+    <div class="header-date-day" id="header-day">–</div>
   </div>
   <div class="header-worker">
     <div>
@@ -477,15 +482,12 @@
     <!-- COL 2: Műveleti adatok -->
     <div class="card">
       <div class="card-lbl">Műveleti adatok</div>
-      <div class="op-header-box">
-        <div class="op-badge-row" style="margin-bottom:6px;">
-          <div class="op-num-badge">
-            <span class="n" id="op-num">–</span>
-            <span class="l">Op.</span>
-          </div>
-          <div class="op-sub" id="op-sub">M-22 · Push-up Triangle Bikini Top</div>
+      <div class="op-header-box" style="display:flex;align-items:center;gap:10px;">
+        <div class="op-num-badge" style="flex-shrink:0;">
+          <span class="n" id="op-num">–</span>
+          <span class="l">Op.</span>
         </div>
-        <div class="op-title" id="op-title">Betöltés...</div>
+        <div class="op-title" id="op-title" style="flex:1;background:var(--purple-light);border:1px solid #C4B5FD;border-radius:8px;padding:8px 10px;">Betöltés...</div>
       </div>
       <div class="op-desc-wrap">
         <div class="op-desc-row" id="desc-row-main" style="display:none">
@@ -750,10 +752,10 @@
           ${m.image_url
             ? `<img class="material-img" src="${m.image_url}" onerror="this.style.display='none'" alt="${m.name}">`
             : `<div class="material-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`}
-          <div>
+          <div style="flex:1;min-width:0;">
             <div class="material-name">${m.name || '–'}</div>
-            ${m.amount ? `<div class="material-amt">${m.amount} db</div>` : ''}
           </div>
+          ${m.amount != null ? `<div class="material-right"><div class="material-amt">${m.amount}</div><div class="material-unit">${m.unit || 'db'}</div></div>` : ''}
         </div>`).join('');
     } else {
       matSection.style.display = 'none';

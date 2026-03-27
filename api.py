@@ -323,6 +323,7 @@ def get_production_op(op_id):
                     pv.product_id as material_product_id,
                     pc.amount,
                     pt.name as material_name,
+                    p.unit as material_unit,
                     (SELECT pi2.path
                      FROM product_images_with_paths pi2
                      WHERE pi2.product_id = pv.product_id
@@ -330,6 +331,7 @@ def get_production_op(op_id):
                 FROM product_component_operations pco
                 JOIN product_components pc ON pc.id = pco.product_component_id
                 JOIN product_variants pv ON pv.id = pc.material_id
+                JOIN products p ON p.id = pv.product_id
                 LEFT JOIN product_translations pt ON pt.product_id = pv.product_id
                     AND pt.language_code = 'hu'
                 WHERE pco.product_manufacturing_operation_id IN ({ph2})
@@ -365,10 +367,13 @@ def get_production_op(op_id):
                 if r['image_path']:
                     img_url = cdn_url(r['image_path'])
                 name = r['material_name'] or en_names.get(r['material_product_id'])
+                unit_id = r.get('material_unit')
+                unit_label = 'Méter' if unit_id == 2 else 'db'
                 materials_by_pmo[pid].append({
                     'id': r['material_id'],
                     'name': name,
                     'amount': r['amount'],
+                    'unit': unit_label,
                     'product_id': r['material_product_id'],
                     'image_url': img_url,
                 })
