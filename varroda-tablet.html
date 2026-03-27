@@ -598,6 +598,7 @@
   let mfgOps = [];
   let currentOpIndex = 0;
   let selectedColor = 'black';
+  let customSizes = { ...COLORS.black.sizes };
   let running = false, secs = 0, iv = null;
 
   async function init() {
@@ -671,6 +672,7 @@
 
   function selectColor(color) {
     selectedColor = color;
+    customSizes = { ...COLORS[color].sizes };
     document.getElementById('btn-black').classList.toggle('active', color === 'black');
     document.getElementById('btn-red').classList.toggle('active', color === 'red');
 
@@ -686,7 +688,11 @@
     let total = 0;
     SLABELS.forEach(s => {
       const el = document.getElementById(`size-${s.toLowerCase()}`);
-      if (el) total += parseInt(el.value) || 0;
+      if (el) {
+        const val = parseInt(el.value) || 0;
+        customSizes[s] = val;
+        total += val;
+      }
     });
     const totalEl = document.getElementById('total-qty-display');
     if (totalEl) totalEl.textContent = total || '–';
@@ -760,10 +766,9 @@
       indicator.textContent = '▶ Nincs videó ehhez a művelethez';
     }
 
-    // Méretek – szerkeszthető inputok
-    const sizes = color.sizes;
+    // Méretek – szerkeszthető inputok (customSizes-ből, megőrzi a módosításokat)
     document.getElementById('sizes-grid').innerHTML =
-      Object.entries(sizes).map(([s, q]) =>
+      Object.entries(customSizes).map(([s, q]) =>
         `<div class="size-item">
           <span class="size-lbl">${s}</span>
           <input type="number" class="size-input" id="size-${s.toLowerCase()}"
