@@ -342,6 +342,16 @@
   .timer-target { font-size: 10px; color: var(--gray-400); margin-top: 5px; }
   .timer-target strong { color: var(--purple); }
   .spacer { flex: 1; }
+  .done-btn {
+    width: 100%; padding: 13px;
+    background: var(--purple); border: none;
+    border-radius: 12px; color: white;
+    font-size: 14px; font-weight: 800;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all .2s;
+  }
+  .done-btn:hover { background: var(--purple-dark); transform: translateY(-1px); }
   .problem-btn {
     width: 100%; padding: 13px;
     background: white; border: 2px solid var(--red);
@@ -574,6 +584,7 @@
           <div style="font-size:22px;font-weight:900;color:var(--purple);line-height:1;" id="target-time-btn">–</div>
         </div>
       </div>
+      <button class="done-btn" onclick="markDone()">✓ Végeztem</button>
       <div class="spacer"></div>
       <button class="problem-btn">⚠ Időprobléma</button>
     </div>
@@ -802,6 +813,10 @@
 
     document.getElementById('btn-prev').disabled = currentOpIndex === 0;
     document.getElementById('btn-next').disabled = currentOpIndex >= mfgOps.length - 1;
+  }
+
+  function markDone() {
+    navigate(1);
   }
 
   function navigate(dir) {
