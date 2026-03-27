@@ -708,7 +708,6 @@
     });
     const totalEl = document.getElementById('total-qty-display');
     if (totalEl) totalEl.textContent = total || '–';
-    document.getElementById('op-qty').textContent = total;
 
     const op = mfgOps[currentOpIndex];
     const timeSec = op ? (op.time_sec || 0) : 0;
