@@ -10,6 +10,18 @@ import pymysql
 import pymysql.cursors
 from urllib.parse import quote
 
+CDN = "https://media-01.prodyflow.com/storage/vivienvance/images"
+
+def cdn_url(path):
+    """Prodyflow CDN thumbnail URL az img_path alapján (extension nélkül)."""
+    if not path:
+        return None
+    # Ha a path tartalmaz extension-t (.jpg, .png stb.), levágjuk
+    import os
+    path_no_ext = os.path.splitext(path)[0]
+    img_name = os.path.splitext(path_no_ext.split("/")[-1])[0]
+    return f"{CDN}/{quote(path_no_ext, safe='/')}/262-portrait-{quote(img_name)}.webp"
+
 app = Flask(__name__)
 CORS(app)
 
@@ -310,7 +322,7 @@ def get_production_op(op_id):
                     pv.product_id as material_product_id,
                     pc.amount,
                     pt.name as material_name,
-                    (SELECT CONCAT(pi2.path, pi2.format)
+                    (SELECT pi2.path
                      FROM product_images_with_paths pi2
                      WHERE pi2.product_id = pv.product_id
                      LIMIT 1) as image_path
@@ -350,7 +362,7 @@ def get_production_op(op_id):
                     materials_by_pmo[pid] = []
                 img_url = None
                 if r['image_path']:
-                    img_url = f'https://vivienvance.prodyflow.com/storage/{quote(r["image_path"], safe="/")}'
+                    img_url = cdn_url(r['image_path'])
                 name = r['material_name'] or en_names.get(r['material_product_id'])
                 materials_by_pmo[pid].append({
                     'id': r['material_id'],
@@ -388,16 +400,16 @@ def get_product_images(product_id):
     try:
         cur = conn.cursor()
         cur.execute('''
-            SELECT CONCAT(path, format) as full_path
+            SELECT path
             FROM product_images_with_paths
             WHERE product_id = %s
             LIMIT 5
         ''', (product_id,))
         images = []
         for r in cur.fetchall():
-            fp = r['full_path']
+            fp = r['path']
             if fp:
-                images.append({'url': f'https://vivienvance.prodyflow.com/storage/{quote(fp, safe="/")}'})
+                images.append({'url': cdn_url(fp)})
         return jsonify(images)
     finally:
         conn.close()
