@@ -446,6 +446,8 @@
     <div class="header-date-full" id="header-date">Betöltés...</div>
     <div class="header-date-sep">|</div>
     <div class="header-date-day" id="header-day">–</div>
+    <div class="header-date-sep">|</div>
+    <div class="header-date-day" id="header-clock">–</div>
   </div>
   <div class="header-worker">
     <div>
@@ -609,12 +611,20 @@
   let customSizes = { ...COLORS.black.sizes };
   let running = false, secs = 0, iv = null;
 
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('header-clock').textContent =
+      now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
+  }
+
   async function init() {
     const d = new Date();
     document.getElementById('header-day').textContent =
       d.toLocaleDateString('hu-HU', {weekday:'long'}).replace(/^./, c => c.toUpperCase());
     document.getElementById('header-date').textContent =
       d.toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'});
+    updateClock();
+    setInterval(updateClock, 10000);
 
     // Termék kép betöltése API-ból
     try {
