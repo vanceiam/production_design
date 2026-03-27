@@ -445,9 +445,9 @@
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="tb-search">🔍 Termék neve, cikkszám...</div>
-    <div class="tb-date">📅 Február 20, 2025 – Február 20, 2026</div>
-    <div class="tb-store">🏠 Összes raktár ▾</div>
+    <div class="tb-search">🔍 Varroda munkaterv</div>
+    <div class="tb-date" id="tb-date">📅 Betöltés...</div>
+    <div class="tb-store" id="tb-batch-count">🏭 – aktív gyártás</div>
     <div class="tb-avatar">MV</div>
   </div>
 
@@ -457,179 +457,26 @@
     <!-- Header -->
     <div class="sched-header">
       <div class="sh-workers">Varrónő</div>
-      <div class="sh-day">
-        <div class="sh-day-name today">📅 Ma (Márc 27)</div>
-        <div class="sh-day-cap"><span class="cap-badge">8 óra</span> napi kapacitás</div>
+      <div class="sh-day" id="sh-col1">
+        <div class="sh-day-name today" id="sh-col1-name">Betöltés...</div>
+        <div class="sh-day-cap"><span class="cap-badge" id="sh-col1-qty">–</span> db</div>
       </div>
-      <div class="sh-day">
-        <div class="sh-day-name">Márc 28 (Péntek)</div>
-        <div class="sh-day-cap"><span class="cap-badge">8 óra</span> napi kapacitás</div>
+      <div class="sh-day" id="sh-col2">
+        <div class="sh-day-name" id="sh-col2-name">–</div>
+        <div class="sh-day-cap"><span class="cap-badge" id="sh-col2-qty">–</span> db</div>
       </div>
-      <div class="sh-day">
-        <div class="sh-day-name">Márc 31 (Hétfő)</div>
-        <div class="sh-day-cap"><span class="cap-badge">8 óra</span> napi kapacitás</div>
+      <div class="sh-day" id="sh-col3">
+        <div class="sh-day-name" id="sh-col3-name">–</div>
+        <div class="sh-day-cap"><span class="cap-badge" id="sh-col3-qty">–</span> db</div>
       </div>
     </div>
 
     <!-- Body -->
-    <div class="sched-body">
+    <div class="sched-body" id="sched-body">
+      <div style="padding:20px;color:var(--gray-400);font-size:13px">Adatok betöltése...</div>
+    </div>
 
-      <!-- Worker 1: Kovács Veronika -->
-      <div class="w-row">
-        <div class="w-cell">
-          <div class="w-avatar" style="background:linear-gradient(135deg,#7C3AED,#5B21B6)">KV</div>
-          <div>
-            <div class="w-name">Kovács Veronika</div>
-            <div class="w-status">● Aktív</div>
-          </div>
-        </div>
-        <div class="d-cell today">
-          <div class="tc big" onclick="openModal()">
-            <div class="tc-dot pend"></div>
-            <div class="tc-thumb">👗</div>
-            <div class="tc-info">
-              <div class="tc-h">5.3 óra</div>
-              <div class="tc-nm">Csomagolás</div>
-              <div class="tc-m">M-13 / Op 27</div>
-            </div>
-          </div>
-          <div class="tc or done" onclick="openModal()">
-            <div class="tc-dot done2"></div>
-            <div class="tc-h">2.7 óra</div>
-            <div class="tc-m">M-11 / Op 14<br>Varrás</div>
-          </div>
-        </div>
-        <div class="d-cell">
-          <div class="tc" onclick="openModal()">
-            <div class="tc-dot"></div>
-            <div class="tc-h">4.0 óra</div>
-            <div class="tc-m">M-13 / Op 31<br>Ellenőrzés</div>
-          </div>
-        </div>
-        <div class="d-cell">
-          <div class="tc or" onclick="openModal()">
-            <div class="tc-dot pend"></div>
-            <div class="tc-h">6.0 óra</div>
-            <div class="tc-m">M-15 / Op 8<br>Varrás</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Worker 2: Nagy Szilvia -->
-      <div class="w-row">
-        <div class="w-cell">
-          <div class="w-avatar" style="background:linear-gradient(135deg,#F97316,#EA580C)">NS</div>
-          <div>
-            <div class="w-name">Nagy Szilvia</div>
-            <div class="w-status">● Aktív</div>
-          </div>
-        </div>
-        <div class="d-cell today">
-          <div class="tc or" onclick="openModal()">
-            <div class="tc-dot pend"></div>
-            <div class="tc-h">5.3 óra</div>
-            <div class="tc-m">M-13 / Op 29</div>
-          </div>
-          <div class="tc or big" style="flex:2" onclick="openModal()">
-            <div class="tc-thumb" style="background:#FFF7ED;border-color:#FED7AA">👔</div>
-            <div class="tc-info">
-              <div class="tc-h">5.3 óra</div>
-              <div class="tc-nm">Befejező varrás</div>
-              <div class="tc-m">M-13 / Op 29</div>
-            </div>
-          </div>
-        </div>
-        <div class="d-cell">
-          <div class="tc" onclick="openModal()">
-            <div class="tc-dot pend"></div>
-            <div class="tc-h">5.3 óra</div>
-            <div class="tc-m">M-13 / Op 29<br>Befejező varrás</div>
-          </div>
-        </div>
-        <div class="d-cell"></div>
-      </div>
-
-      <!-- Worker 3: Horváth Mária -->
-      <div class="w-row">
-        <div class="w-cell">
-          <div class="w-avatar" style="background:linear-gradient(135deg,#22C55E,#16A34A)">HM</div>
-          <div>
-            <div class="w-name">Horváth Mária</div>
-            <div class="w-status">● Aktív</div>
-          </div>
-        </div>
-        <div class="d-cell today">
-          <div class="tc gr" onclick="openModal()">
-            <div class="tc-dot" style="background:var(--green)"></div>
-            <div class="tc-h">3.5 óra</div>
-            <div class="tc-m">M-12 / Op 15<br>Szabás</div>
-          </div>
-          <div class="tc" onclick="openModal()">
-            <div class="tc-dot pend"></div>
-            <div class="tc-h">4.5 óra</div>
-            <div class="tc-m">M-13 / Op 27<br>Csomagolás</div>
-          </div>
-        </div>
-        <div class="d-cell">
-          <div class="tc or" onclick="openModal()">
-            <div class="tc-dot"></div>
-            <div class="tc-h">8.0 óra</div>
-            <div class="tc-m">M-14 / Op 3<br>Összevarrás</div>
-          </div>
-        </div>
-        <div class="d-cell"></div>
-      </div>
-
-      <!-- Worker 4: Tóth Katalin -->
-      <div class="w-row">
-        <div class="w-cell">
-          <div class="w-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">TK</div>
-          <div>
-            <div class="w-name">Tóth Katalin</div>
-            <div class="w-status">⏸ Szünet</div>
-          </div>
-        </div>
-        <div class="d-cell today"></div>
-        <div class="d-cell">
-          <div class="tc" onclick="openModal()">
-            <div class="tc-dot pend"></div>
-            <div class="tc-h">7.0 óra</div>
-            <div class="tc-m">M-13 / Op 27<br>Csomagolás</div>
-          </div>
-        </div>
-        <div class="d-cell"></div>
-      </div>
-
-      <!-- Worker 5: Fekete Erika -->
-      <div class="w-row">
-        <div class="w-cell">
-          <div class="w-avatar" style="background:linear-gradient(135deg,#EC4899,#BE185D)">FE</div>
-          <div>
-            <div class="w-name">Fekete Erika</div>
-            <div class="w-status">● Aktív</div>
-          </div>
-        </div>
-        <div class="d-cell today">
-          <div class="tc" onclick="openModal()">
-            <div class="tc-dot"></div>
-            <div class="tc-h">6.0 óra</div>
-            <div class="tc-m">M-16 / Op 5<br>Szegés</div>
-          </div>
-        </div>
-        <div class="d-cell"></div>
-        <div class="d-cell">
-          <div class="tc gr" onclick="openModal()">
-            <div class="tc-dot" style="background:var(--green)"></div>
-            <div class="tc-h">5.5 óra</div>
-            <div class="tc-m">M-13 / Op 12<br>Minőségellenőrzés</div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /sched-body -->
   </div><!-- /scheduler -->
-</div><!-- /main -->
-
 
 <!-- ══ OPERATION MODAL ══ -->
 <div class="overlay" id="overlay" onclick="closeOvl(event)">
@@ -638,121 +485,63 @@
     <div class="modal-hdr">
       <div class="modal-hdr-icon">✂</div>
       <div>
-        <div class="modal-hdr-title">Op #27 · Csomagolás · M-13 Black N-33</div>
-        <div class="modal-hdr-sub">BU181579-31 · Kovács Veronika · Március 27, 2026</div>
-      </div>
-      <div class="modal-nav">
-        <button class="modal-nav-btn">←</button>
-        <button class="modal-nav-btn">→</button>
+        <div class="modal-hdr-title" id="m-title">–</div>
+        <div class="modal-hdr-sub" id="m-sub">–</div>
       </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
 
     <div class="modal-body">
 
-      <!-- LEFT: Product + Team -->
+      <!-- LEFT: Product + workers with this op -->
       <div class="modal-col">
-        <div class="lbl">Termék képek</div>
+        <div class="lbl">Termék</div>
         <div class="prod-main">👗</div>
-        <div class="prod-thumbs">
-          <div class="prod-thumb">📸</div>
-          <div class="prod-thumb">🖼</div>
-          <div class="prod-thumb">📷</div>
-        </div>
-        <div class="prod-name">N-33 · Black</div>
-        <div class="prod-code">Modell: M-13 · Op. 27</div>
+        <div class="prod-name" id="m-prod-name">–</div>
+        <div class="prod-code" id="m-prod-code">–</div>
 
         <div class="divider"></div>
-        <div class="lbl">Csapat idők</div>
-        <div class="team-list">
-          <div class="team-item">
-            <div class="team-av" style="background:linear-gradient(135deg,#7C3AED,#5B21B6)">KV</div>
-            <div class="team-nm">Kovács V.</div>
-            <div class="team-t">76s</div>
-          </div>
-          <div class="team-item">
-            <div class="team-av" style="background:linear-gradient(135deg,#F97316,#EA580C)">NS</div>
-            <div class="team-nm">Nagy Sz.</div>
-            <div class="team-t">80s</div>
-          </div>
-          <div class="team-item">
-            <div class="team-av" style="background:linear-gradient(135deg,#22C55E,#16A34A)">HM</div>
-            <div class="team-nm">Horváth M.</div>
-            <div class="team-t">89s</div>
-          </div>
-        </div>
+        <div class="lbl">Elvégzők</div>
+        <div class="team-list" id="m-team-list">–</div>
       </div>
 
-      <!-- MIDDLE: Op info + sizes + materials + video -->
+      <!-- MIDDLE: Op info + sizes + video -->
       <div class="modal-col">
-        <div class="op-num-large">27</div>
-        <div class="op-title-lg">Csomagolás</div>
-        <div class="op-desc-txt">Termék összehajtogatása és csomagolása megadott méret szerint. Figyelni kell a méretcímkékre és a rendelési azonosítóra.</div>
+        <div class="op-num-large" id="m-op-num">–</div>
+        <div class="op-title-lg" id="m-op-name">–</div>
+        <div class="op-desc-txt" id="m-op-desc">–</div>
 
         <div class="divider"></div>
         <div class="stats-row">
-          <div class="stat-box pu"><div class="stat-v">70<small style="font-size:11px">mp</small></div><div class="stat-l">Idő/db</div></div>
-          <div class="stat-box or"><div class="stat-v">270</div><div class="stat-l">Darab</div></div>
-          <div class="stat-box gn"><div class="stat-v">228<small style="font-size:11px">p</small></div><div class="stat-l">Kész</div></div>
+          <div class="stat-box pu"><div class="stat-v" id="m-time">–</div><div class="stat-l">Idő/db (mp)</div></div>
+          <div class="stat-box or"><div class="stat-v" id="m-qty">–</div><div class="stat-l">Darab</div></div>
+          <div class="stat-box gn"><div class="stat-v" id="m-total-h">–</div><div class="stat-l">Össz. óra</div></div>
         </div>
 
-        <div class="lbl">Méretek</div>
-        <div class="sizes-grid">
-          <div class="size-item"><span class="size-lbl">S</span><span class="size-val">100</span></div>
-          <div class="size-item"><span class="size-lbl">M</span><span class="size-val">70</span></div>
-          <div class="size-item"><span class="size-lbl">L</span><span class="size-val">30</span></div>
-          <div class="size-item"><span class="size-lbl">XS</span><span class="size-val">70</span></div>
-        </div>
-
-        <div class="divider"></div>
-        <div class="lbl">Szükséges anyagok</div>
-        <div class="mat-list">
-          <div class="mat-tag">📷 Fényképek</div>
-          <div class="mat-tag">🔢 Sorozatszám</div>
-          <div class="mat-tag">📛 Névtábla</div>
-          <div class="mat-tag">📐 Méretjelző</div>
-        </div>
+        <div class="lbl">Variáns bontás</div>
+        <div class="sizes-grid" id="m-sizes">–</div>
 
         <div class="divider"></div>
         <div class="lbl">Videó útmutató</div>
         <div class="video-box">
           <div class="video-play">▶</div>
-          <div class="video-caption">Op 27 · Csomagolás útmutató</div>
+          <div class="video-caption" id="m-video-cap">–</div>
         </div>
       </div>
 
-      <!-- RIGHT: Order + actions -->
+      <!-- RIGHT: Production op details -->
       <div class="modal-col">
-        <div class="lbl">Rendelés adatok</div>
-        <div class="order-fields">
-          <div class="order-field">
-            <div class="order-fl">Rendelés ID</div>
-            <div class="order-fv">BU181579-31</div>
-          </div>
-          <div class="order-field">
-            <div class="order-fl">Létrehozva</div>
-            <div class="order-fv">2026-03-20</div>
-          </div>
-          <div class="order-field">
-            <div class="order-fl">Premier dátum</div>
-            <div class="order-fv" style="color:var(--orange)">2026-04-05</div>
-          </div>
-        </div>
+        <div class="lbl">Gyártás adatok</div>
+        <div class="order-fields" id="m-order-fields">–</div>
 
         <div class="divider"></div>
-        <div class="lbl">Eszközök</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
-          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">📦</span><span style="font-size:9px;color:var(--gray-400)">Eszköz neve</span></div>
-          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">📸</span><span style="font-size:9px;color:var(--gray-400)">Fénykép</span></div>
-          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">📋</span><span style="font-size:9px;color:var(--gray-400)">Sablon</span></div>
-          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">🔧</span><span style="font-size:9px;color:var(--gray-400)">Szerszám</span></div>
-        </div>
+        <div class="lbl">Összes művelet ebben a gyártásban</div>
+        <div id="m-all-ops" style="font-size:11px;color:var(--gray-600);line-height:1.8">–</div>
 
         <div class="divider"></div>
         <div class="lbl">Termelés vezérlés</div>
         <button class="modal-start-btn">▶ Termelés indítása</button>
-        <div class="timer-disp">03:56:00</div>
-        <button class="problem-btn">⚠ Időprobléma jelzés</button>
+        <button class="problem-btn" style="margin-top:8px">⚠ Időprobléma jelzés</button>
       </div>
 
     </div>
@@ -760,10 +549,213 @@
 </div>
 
 <script>
-  function openModal()  { document.getElementById('overlay').classList.add('open'); }
+  const API = 'http://srv1478417.hstgr.cloud:5050';
+  const COLORS = ['#7C3AED','#F97316','#22C55E','#EF4444','#EC4899','#8B5CF6','#0EA5E9','#14B8A6','#F59E0B'];
+  const SIZES = ['XS','S','M','L','XL','XXL'];
+
+  let scheduleData = null;
+  let prodOpsCache = {};
+
+  // ── Init ─────────────────────────────────────
+  async function init() {
+    const d = new Date();
+    document.getElementById('tb-date').textContent =
+      '📅 ' + d.toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'});
+
+    try {
+      const [schedRes, opsRes] = await Promise.all([
+        fetch(`${API}/api/schedule`),
+        fetch(`${API}/api/production-ops`)
+      ]);
+      scheduleData = await schedRes.json();
+      const ops = await opsRes.json();
+
+      document.getElementById('tb-batch-count').textContent =
+        `🏭 ${scheduleData.production_ops.length} aktív gyártás`;
+
+      renderHeaders(scheduleData.production_ops.slice(0, 3));
+      renderRows(scheduleData.assignments, scheduleData.production_ops.slice(0, 3));
+    } catch(e) {
+      document.getElementById('sched-body').innerHTML =
+        `<div style="padding:20px;color:red;font-size:13px">API hiba: ${e.message}</div>`;
+    }
+  }
+
+  function renderHeaders(prodOps) {
+    for (let i = 0; i < 3; i++) {
+      const op = prodOps[i];
+      const nameEl = document.getElementById(`sh-col${i+1}-name`);
+      const qtyEl  = document.getElementById(`sh-col${i+1}-qty`);
+      if (op) {
+        nameEl.textContent = '🏭 ' + op.title;
+        qtyEl.textContent = '–';
+        // Fetch total qty asynchronously
+        fetchAndCacheProdOp(op.id).then(detail => {
+          if (detail) qtyEl.textContent = detail.total_qty;
+        });
+      } else {
+        nameEl.textContent = '–';
+        qtyEl.textContent = '–';
+      }
+    }
+  }
+
+  async function fetchAndCacheProdOp(id) {
+    if (prodOpsCache[id]) return prodOpsCache[id];
+    try {
+      const res = await fetch(`${API}/api/production-ops/${id}`);
+      const data = await res.json();
+      prodOpsCache[id] = data;
+      return data;
+    } catch(e) { return null; }
+  }
+
+  function renderRows(assignments, prodOps) {
+    const body = document.getElementById('sched-body');
+    if (!assignments.length) {
+      body.innerHTML = '<div style="padding:20px;color:var(--gray-400)">Nincs adat</div>';
+      return;
+    }
+
+    const html = assignments.map((a, wi) => {
+      const color = COLORS[wi % COLORS.length];
+      const cells = prodOps.map((op, ci) => {
+        // Worker's ops that exist in this production op
+        const workerOpsForProd = a.ops.filter(wo =>
+          wo.production.some(p => p.prod_op_id === op.id)
+        );
+
+        if (!workerOpsForProd.length) {
+          return `<div class="d-cell${ci===0?' today':''}"></div>`;
+        }
+
+        const cardColors = ['or', 'gr', ''];
+        const cards = workerOpsForProd.slice(0, 3).map((wo, oi) => {
+          const prodCtx = wo.production.find(p => p.prod_op_id === op.id);
+          const timeSec = prodCtx?.time_sec || 0;
+          const qty = prodCtx?.total_qty || 0;
+          const hrs = timeSec && qty ? (timeSec * qty / 3600).toFixed(1) : '–';
+          const cls = oi === 0 ? 'big' : '';
+          const cc = cardColors[oi % cardColors.length];
+          return `
+            <div class="tc ${cc} ${cls}" onclick="openModal(${op.id}, ${JSON.stringify(wo).replace(/"/g,'&quot;')}, ${wi})">
+              <div class="tc-dot pend"></div>
+              ${cls === 'big' ? `<div class="tc-thumb">👗</div><div class="tc-info">` : ''}
+              <div class="tc-h">${hrs !== '–' ? hrs + ' óra' : '–'}</div>
+              <div class="tc-nm" style="font-size:11px;font-weight:700;color:var(--gray-800)">${wo.op_name}</div>
+              <div class="tc-m">${op.title}</div>
+              ${cls === 'big' ? `</div>` : ''}
+            </div>`;
+        }).join('');
+
+        return `<div class="d-cell${ci===0?' today':''}">${cards}</div>`;
+      });
+
+      return `
+        <div class="w-row">
+          <div class="w-cell">
+            <div class="w-avatar" style="background:${color}">${a.worker_initials}</div>
+            <div>
+              <div class="w-name">${a.worker_name}</div>
+              <div class="w-status">● Aktív</div>
+            </div>
+          </div>
+          ${cells.join('')}
+        </div>`;
+    }).join('');
+
+    body.innerHTML = html;
+  }
+
+  // ── Modal ─────────────────────────────────────
+  async function openModal(prodOpId, workerOp, workerIdx) {
+    document.getElementById('overlay').classList.add('open');
+
+    const detail = await fetchAndCacheProdOp(prodOpId);
+    if (!detail) return;
+
+    const prodCtx = workerOp.production.find(p => p.prod_op_id === prodOpId);
+
+    document.getElementById('m-title').textContent =
+      `${workerOp.op_name} · ${detail.title}`;
+    document.getElementById('m-sub').textContent =
+      `Gyártás ID: #${detail.id} · ${new Date(detail.created_at).toLocaleDateString('hu-HU')}`;
+
+    // Product
+    const prodName = detail.items.length ? detail.items[0].product_name : detail.title;
+    document.getElementById('m-prod-name').textContent = detail.title;
+    document.getElementById('m-prod-code').textContent = prodName;
+
+    // Workers with this op
+    const assignedWorkers = scheduleData.assignments.filter(a =>
+      a.ops.some(o => o.op_name === workerOp.op_name &&
+        o.production.some(p => p.prod_op_id === prodOpId))
+    );
+    document.getElementById('m-team-list').innerHTML = assignedWorkers.map((a, i) => `
+      <div class="team-item">
+        <div class="team-av" style="background:${COLORS[scheduleData.assignments.indexOf(a) % COLORS.length]}">${a.worker_initials}</div>
+        <div class="team-nm">${a.worker_name}</div>
+      </div>`).join('') || '–';
+
+    // Op details
+    const fullOp = detail.manufacturing_ops.find(m => m.name === workerOp.op_name);
+    document.getElementById('m-op-num').textContent = fullOp?.order ?? '–';
+    document.getElementById('m-op-name').textContent = workerOp.op_name;
+    document.getElementById('m-op-desc').textContent = workerOp.description || fullOp?.description || '–';
+
+    const timeSec = prodCtx?.time_sec || fullOp?.time_sec || 0;
+    const qty = detail.total_qty;
+    const totalH = timeSec && qty ? (timeSec * qty / 3600).toFixed(1) : '–';
+    document.getElementById('m-time').textContent = timeSec || '–';
+    document.getElementById('m-qty').textContent = qty;
+    document.getElementById('m-total-h').textContent = totalH !== '–' ? totalH + 'ó' : '–';
+    document.getElementById('m-video-cap').textContent = `${workerOp.op_name} útmutató`;
+
+    // Size totals
+    const sizes = detail.size_totals || {};
+    const entries = Object.entries(sizes);
+    document.getElementById('m-sizes').innerHTML = entries.length
+      ? entries.map(([lbl, q], i) => {
+          const sl = lbl.length > 10 ? (SIZES[i] || `V${i+1}`) : lbl;
+          return `<div class="size-item"><span class="size-lbl">${sl}</span><span class="size-val">${q}</span></div>`;
+        }).join('')
+      : '<div style="color:var(--gray-400);font-size:12px">–</div>';
+
+    // Order fields
+    document.getElementById('m-order-fields').innerHTML = `
+      <div class="order-field">
+        <div class="order-fl">Gyártás neve</div>
+        <div class="order-fv">${detail.title}</div>
+      </div>
+      <div class="order-field">
+        <div class="order-fl">Létrehozva</div>
+        <div class="order-fv">${detail.created_at ? detail.created_at.slice(0,10) : '–'}</div>
+      </div>
+      <div class="order-field">
+        <div class="order-fl">Határidő</div>
+        <div class="order-fv" style="color:var(--orange)">${detail.deadline ? detail.deadline.slice(0,10) : '–'}</div>
+      </div>
+      <div class="order-field">
+        <div class="order-fl">Összes darab</div>
+        <div class="order-fv">${qty} db</div>
+      </div>`;
+
+    // All ops in this production
+    document.getElementById('m-all-ops').innerHTML = detail.manufacturing_ops.length
+      ? detail.manufacturing_ops
+          .filter((m, i, arr) => arr.findIndex(x => x.name === m.name) === i)
+          .map(m => `<div style="padding:3px 0;border-bottom:1px solid var(--gray-100)">
+            <strong style="color:var(--gray-700)">${m.name}</strong>
+            ${m.time_sec ? `<span style="color:var(--purple);font-weight:700"> · ${m.time_sec}mp</span>` : ''}
+          </div>`).join('')
+      : '<div style="color:var(--gray-400)">Nincs rögzített művelet</div>';
+  }
+
   function closeModal() { document.getElementById('overlay').classList.remove('open'); }
   function closeOvl(e)  { if (e.target === document.getElementById('overlay')) closeModal(); }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  init();
 </script>
 </body>
 </html>

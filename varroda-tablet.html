@@ -62,6 +62,7 @@
     background: var(--orange);
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 13px; color: white;
+    cursor: pointer;
   }
   .worker-nm  { font-size: 13px; font-weight: 600; text-align: right; }
   .worker-rl  { font-size: 10px; opacity: .7; text-align: right; }
@@ -119,6 +120,12 @@
   .product-main:hover, .product-main.active { border-color: var(--purple); }
   .product-name { font-size: 13px; font-weight: 800; color: var(--gray-900); margin-top: 8px; }
   .product-code { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+  .prod-select {
+    margin-top: 8px; padding: 5px 6px;
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 7px; font-size: 10px; color: var(--gray-700);
+    cursor: pointer; width: 100%;
+  }
 
   /* ══ COL 2: Műveleti adatok ══ */
   .op-badge-row {
@@ -141,7 +148,6 @@
     font-size: 12px; color: var(--gray-500); line-height: 1.65;
     flex: 1; overflow-y: auto;
   }
-  /* Materials as compact chips at the bottom of op col */
   .mat-section { flex-shrink: 0; margin-top: 10px; }
   .mat-lbl {
     font-size: 9px; font-weight: 700;
@@ -165,7 +171,7 @@
     font-size: 13px; flex-shrink: 0;
   }
 
-  /* ══ COL 3: Idők & Méretek — LARGE numbers ══ */
+  /* ══ COL 3: Idők & Méretek ══ */
   .stat-group { flex-shrink: 0; margin-bottom: 8px; }
   .stat-big {
     display: flex; align-items: baseline; gap: 4px;
@@ -340,11 +346,44 @@
   .dot.done   { background: var(--green); }
   .dot.active { background: var(--purple); transform: scale(1.3); }
 
+  /* ── Worker select overlay ── */
+  .worker-overlay {
+    position: fixed; inset: 0;
+    background: rgba(30,27,75,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .worker-overlay.hidden { display: none; }
+  .worker-picker {
+    background: white; border-radius: 20px;
+    padding: 28px; min-width: 340px; max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .wp-title { font-size: 18px; font-weight: 800; color: var(--gray-900); margin-bottom: 4px; }
+  .wp-sub   { font-size: 12px; color: var(--gray-400); margin-bottom: 20px; }
+  .wp-list  { display: flex; flex-direction: column; gap: 8px; }
+  .wp-item  {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 12px;
+    border: 2px solid var(--gray-200);
+    cursor: pointer; transition: all .2s;
+  }
+  .wp-item:hover { border-color: var(--purple); background: var(--purple-light); }
+  .wp-av {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: white;
+    flex-shrink: 0;
+  }
+  .wp-nm { font-size: 14px; font-weight: 700; color: var(--gray-900); }
+
+  /* Loading state */
+  .loading-msg { color: var(--gray-400); font-size: 12px; font-style: italic; }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 3px; height: 3px; }
   ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
 
-  /* Timer anim */
   @keyframes tick {
     from { color: var(--gray-900); }
     to   { color: var(--purple); }
@@ -354,72 +393,78 @@
 </head>
 <body>
 
+<!-- WORKER SELECT OVERLAY -->
+<div class="worker-overlay" id="worker-overlay">
+  <div class="worker-picker">
+    <div class="wp-title">Varroda Belépés</div>
+    <div class="wp-sub">Válaszd ki a nevedet</div>
+    <div class="wp-list" id="worker-list">
+      <div class="loading-msg">Varrónők betöltése...</div>
+    </div>
+  </div>
+</div>
+
 <!-- HEADER -->
 <div class="header">
   <div class="logo">P</div>
   <div>
     <div class="header-title">Varroda Feladatok</div>
-    <div class="header-sub">Ma: Március 27, 2026</div>
+    <div class="header-sub" id="header-date">Betöltés...</div>
   </div>
   <div class="header-worker">
     <div>
-      <div class="worker-nm">Kovács Veronika</div>
-      <div class="worker-rl">Varrónő · M-13 modell</div>
+      <div class="worker-nm" id="header-worker-name">–</div>
+      <div class="worker-rl" id="header-worker-role">Varrónő</div>
     </div>
-    <div class="worker-av">KV</div>
+    <div class="worker-av" id="header-worker-av" onclick="showWorkerPicker()" title="Varrónő váltás">–</div>
   </div>
 </div>
 
 <!-- CONTENT -->
 <div class="content">
 
-  <!-- 4-column center grid -->
   <div class="center">
 
-    <!-- COL 1: Termék kép -->
+    <!-- COL 1: Termék -->
     <div class="card">
       <div class="card-lbl">Termék</div>
-      <div class="product-main active">👗</div>
-      <div class="product-name">N-33 · Black</div>
-      <div class="product-code">M-13 modell</div>
+      <div class="product-main active" id="prod-icon">👗</div>
+      <div class="product-name" id="prod-name">–</div>
+      <div class="product-code" id="prod-code">–</div>
+      <select class="prod-select" id="prod-op-select" onchange="onProdOpChange(this.value)">
+        <option>Betöltés...</option>
+      </select>
     </div>
 
-    <!-- COL 2: Műveleti adatok + anyagok chips -->
+    <!-- COL 2: Műveleti adatok -->
     <div class="card">
       <div class="card-lbl">Műveleti adatok</div>
       <div class="op-badge-row">
         <div class="op-num-badge">
-          <span class="n">27</span>
+          <span class="n" id="op-num">–</span>
           <span class="l">Op.</span>
         </div>
         <div>
-          <div class="op-title">Csomagolás</div>
-          <div class="op-model">M-13 / Op 27</div>
+          <div class="op-title" id="op-title">Betöltés...</div>
+          <div class="op-model" id="op-model">–</div>
         </div>
       </div>
-      <div class="op-desc">
-        Termék összehajtogatása és csomagolása megadott méret szerint. Figyelni kell a méretcímkékre és a rendelési azonosítóra. Minden darabot külön kell ellenőrizni.
-      </div>
-      <!-- Materials as small chips -->
+      <div class="op-desc" id="op-desc">–</div>
       <div class="mat-section">
-        <div class="mat-lbl">Szükséges anyagok</div>
-        <div class="mat-list">
-          <div class="mat-item"><div class="mat-item-icon">📷</div>Fényképek</div>
-          <div class="mat-item"><div class="mat-item-icon">🔢</div>Sorozatszám</div>
-          <div class="mat-item"><div class="mat-item-icon">📛</div>Névtábla</div>
-          <div class="mat-item"><div class="mat-item-icon">📐</div>Méretjelző</div>
+        <div class="mat-lbl">Gyártás</div>
+        <div class="mat-list" id="mat-list">
+          <div class="mat-item"><div class="mat-item-icon">⏳</div>Betöltés...</div>
         </div>
       </div>
     </div>
 
-    <!-- COL 3: Idők & Méretek — nagy számok -->
+    <!-- COL 3: Idők & Méretek -->
     <div class="card">
       <div class="card-lbl">Idők &amp; Méretek</div>
 
-      <!-- Op time — biggest number -->
       <div class="stat-group">
         <div class="stat-big">
-          <span class="stat-val">70</span>
+          <span class="stat-val" id="time-val">–</span>
           <span class="stat-unit">mp/db</span>
         </div>
         <div class="stat-lbl">Művelet idő</div>
@@ -427,36 +472,34 @@
 
       <div class="stat-row">
         <div class="stat-pill orange">
-          <span class="pv">270</span>
+          <span class="pv" id="qty-total">–</span>
           <span class="pl">Darab</span>
         </div>
         <div class="stat-pill green">
-          <span class="pv">228p</span>
+          <span class="pv" id="qty-done">0</span>
           <span class="pl">Kész</span>
         </div>
       </div>
 
       <div style="font-size:11px;color:var(--gray-500);margin-bottom:8px;flex-shrink:0;">
-        <span style="font-weight:700;color:var(--gray-700)">Cél idő:</span> 5ó 15p / 315p
+        <span style="font-weight:700;color:var(--gray-700)">Cél idő:</span>
+        <span id="target-time">–</span>
       </div>
 
       <div class="divider"></div>
 
-      <div class="card-lbl" style="margin-bottom:6px">Méretek</div>
-      <div class="sizes-grid">
-        <div class="size-item"><span class="size-lbl">S</span><span class="size-val">100</span></div>
-        <div class="size-item"><span class="size-lbl">M</span><span class="size-val">70</span></div>
-        <div class="size-item"><span class="size-lbl">L</span><span class="size-val">30</span></div>
-        <div class="size-item"><span class="size-lbl">XS</span><span class="size-val">70</span></div>
+      <div class="card-lbl" style="margin-bottom:6px">Variáns bontás</div>
+      <div class="sizes-grid" id="sizes-grid">
+        <div class="size-item"><span class="size-lbl">–</span><span class="size-val">–</span></div>
       </div>
     </div>
 
-    <!-- COL 4: Videó + mini termék képek -->
+    <!-- COL 4: Videó -->
     <div class="card">
       <div class="card-lbl">Videó útmutató</div>
       <div class="video-wrap">
         <div class="play-btn">▶</div>
-        <div class="video-lbl">Op 27 · Csomagolás</div>
+        <div class="video-lbl" id="video-lbl">–</div>
       </div>
       <div class="thumb-row">
         <div class="thumb active">👗</div>
@@ -478,7 +521,7 @@
       <div class="timer-box">
         <div class="timer-lbl">Eltelt idő</div>
         <div class="timer-val" id="timer">00:00:00</div>
-        <div class="timer-target">Cél: <strong>5ó 15p</strong></div>
+        <div class="timer-target">Cél: <strong id="target-time-btn">–</strong></div>
       </div>
 
       <div class="spacer"></div>
@@ -492,18 +535,234 @@
 
 <!-- FOOTER NAV -->
 <div class="footer-nav">
-  <button class="nav-btn" disabled>← Előző</button>
-  <div class="progress-dots">
-    <div class="dot done"></div>
-    <div class="dot done"></div>
-    <div class="dot active"></div>
-    <div class="dot"></div>
-  </div>
-  <button class="nav-btn">Következő →</button>
+  <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Előző</button>
+  <div class="progress-dots" id="progress-dots"></div>
+  <button class="nav-btn" id="btn-next" onclick="navigate(1)">Következő →</button>
 </div>
 
 <script>
+  const API = 'http://srv1478417.hstgr.cloud:5050';
+
+  // State
+  let workers = [];
+  let currentWorker = null;
+  let currentProdOp = null;
+  let mfgOps = [];
+  let currentOpIndex = 0;
+
+  // Timer
   let running = false, secs = 0, iv = null;
+
+  // ── Init ──────────────────────────────────────
+  async function init() {
+    // Date header
+    const d = new Date();
+    document.getElementById('header-date').textContent =
+      'Ma: ' + d.toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'});
+
+    // Load workers
+    try {
+      const res = await fetch(`${API}/api/workers`);
+      workers = await res.json();
+    } catch(e) {
+      document.getElementById('worker-list').innerHTML =
+        '<div style="color:red;font-size:12px">API hiba: ' + e.message + '</div>';
+      return;
+    }
+
+    // Check URL params
+    const params = new URLSearchParams(location.search);
+    const wid = params.get('worker_id');
+    if (wid) {
+      const w = workers.find(x => x.id == wid);
+      if (w) { selectWorker(w); return; }
+    }
+
+    // Show picker
+    renderWorkerPicker();
+  }
+
+  function renderWorkerPicker() {
+    const colors = ['#7C3AED','#F97316','#22C55E','#EF4444','#EC4899','#8B5CF6','#0EA5E9','#14B8A6','#F59E0B'];
+    const html = workers.map((w, i) => `
+      <div class="wp-item" onclick="selectWorker(workers[${i}])">
+        <div class="wp-av" style="background:${colors[i % colors.length]}">${w.initials}</div>
+        <div class="wp-nm">${w.name}</div>
+      </div>`).join('');
+    document.getElementById('worker-list').innerHTML = html || '<div style="color:var(--gray-400)">Nincs varrónő</div>';
+    document.getElementById('worker-overlay').classList.remove('hidden');
+  }
+
+  function showWorkerPicker() {
+    renderWorkerPicker();
+  }
+
+  async function selectWorker(w) {
+    currentWorker = w;
+    document.getElementById('worker-overlay').classList.add('hidden');
+
+    const colors = ['#7C3AED','#F97316','#22C55E','#EF4444','#EC4899','#8B5CF6','#0EA5E9','#14B8A6','#F59E0B'];
+    const i = workers.indexOf(w);
+    document.getElementById('header-worker-name').textContent = w.name;
+    document.getElementById('header-worker-av').textContent = w.initials;
+    document.getElementById('header-worker-av').style.background = colors[i % colors.length];
+
+    // Load production ops
+    await loadProdOps();
+  }
+
+  async function loadProdOps() {
+    if (!currentWorker) return;
+
+    // Get active production ops
+    let ops = [];
+    try {
+      const res = await fetch(`${API}/api/production-ops`);
+      ops = await res.json();
+    } catch(e) { return; }
+
+    // Populate select
+    const sel = document.getElementById('prod-op-select');
+    if (!ops.length) {
+      sel.innerHTML = '<option>Nincs aktív gyártás</option>';
+      return;
+    }
+    sel.innerHTML = ops.map(op =>
+      `<option value="${op.id}">${op.title}</option>`
+    ).join('');
+
+    // Load first op
+    await loadProdOpDetail(ops[0].id);
+  }
+
+  async function onProdOpChange(id) {
+    if (!id) return;
+    await loadProdOpDetail(parseInt(id));
+  }
+
+  async function loadProdOpDetail(opId) {
+    let data;
+    try {
+      const res = await fetch(`${API}/api/production-ops/${opId}`);
+      data = await res.json();
+    } catch(e) { return; }
+
+    currentProdOp = data;
+
+    // Get this worker's manufacturing ops that match the production op's ops
+    let workerOps = [];
+    try {
+      const res = await fetch(`${API}/api/workers/${currentWorker.id}/ops`);
+      workerOps = await res.json();
+    } catch(e) { workerOps = []; }
+
+    // Filter: show worker's ops that appear in this production op
+    const prodMoIds = new Set(data.manufacturing_ops.map(m => m.id));
+    mfgOps = workerOps.filter(op => prodMoIds.has(op.id));
+
+    // Fallback: if no intersection, show worker's ops anyway
+    if (!mfgOps.length) {
+      mfgOps = workerOps.length ? workerOps : data.manufacturing_ops;
+    }
+
+    currentOpIndex = 0;
+    renderOp();
+  }
+
+  function renderOp() {
+    if (!currentProdOp) return;
+
+    const op = mfgOps[currentOpIndex];
+
+    // Product info
+    const prodName = currentProdOp.items.length > 0
+      ? (currentProdOp.items[0].product_name || currentProdOp.title)
+      : currentProdOp.title;
+    document.getElementById('prod-name').textContent = currentProdOp.title;
+    document.getElementById('prod-code').textContent = prodName;
+    document.getElementById('prod-icon').textContent = '👗';
+
+    if (op) {
+      // Find full op details from production op
+      const fullOp = currentProdOp.manufacturing_ops.find(m => m.id === op.id);
+
+      document.getElementById('op-num').textContent = currentOpIndex + 1;
+      document.getElementById('op-title').textContent = op.name;
+      document.getElementById('op-model').textContent = `${currentProdOp.title} / Op ${currentOpIndex + 1}`;
+      document.getElementById('op-desc').textContent = op.description || fullOp?.description || '–';
+      document.getElementById('video-lbl').textContent = `Op ${currentOpIndex + 1} · ${op.name}`;
+
+      const timeSec = fullOp?.time_sec || 0;
+      document.getElementById('time-val').textContent = timeSec || '–';
+
+      const totalQty = currentProdOp.total_qty;
+      const targetMin = timeSec && totalQty ? Math.round(timeSec * totalQty / 60) : 0;
+      const targetStr = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p / ${targetMin}p` : '–';
+      document.getElementById('target-time').textContent = targetStr;
+      document.getElementById('target-time-btn').textContent = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p` : '–';
+
+      // Mat list
+      document.getElementById('mat-list').innerHTML = `
+        <div class="mat-item"><div class="mat-item-icon">🏭</div>${currentProdOp.title}</div>
+        <div class="mat-item"><div class="mat-item-icon">📦</div>${totalQty} db összesen</div>
+      `;
+    } else {
+      document.getElementById('op-num').textContent = '–';
+      document.getElementById('op-title').textContent = 'Nincs hozzárendelt művelet';
+      document.getElementById('op-model').textContent = currentProdOp.title;
+      document.getElementById('op-desc').textContent = 'Ehhez a gyártáshoz nincs hozzárendelt műveleted.';
+      document.getElementById('time-val').textContent = '–';
+      document.getElementById('target-time').textContent = '–';
+      document.getElementById('target-time-btn').textContent = '–';
+      document.getElementById('mat-list').innerHTML =
+        `<div class="mat-item"><div class="mat-item-icon">🏭</div>${currentProdOp.title}</div>`;
+    }
+
+    // Quantities
+    document.getElementById('qty-total').textContent = currentProdOp.total_qty;
+    document.getElementById('qty-done').textContent =
+      currentProdOp.items.reduce((s, i) => s + (i.done_in || 0), 0) || '0';
+
+    // Size grid
+    const sizes = currentProdOp.size_totals || {};
+    const entries = Object.entries(sizes);
+    const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+    let sizeHtml = '';
+    if (entries.length > 0) {
+      entries.forEach(([label, qty], i) => {
+        // Use standard size labels if value looks like a full characteristics string
+        const displayLabel = label.length > 10 ? (SIZES[i] || `V${i+1}`) : label;
+        sizeHtml += `<div class="size-item">
+          <span class="size-lbl">${displayLabel}</span>
+          <span class="size-val">${qty}</span>
+        </div>`;
+      });
+    } else {
+      sizeHtml = `<div class="size-item"><span class="size-lbl">–</span><span class="size-val">–</span></div>`;
+    }
+    document.getElementById('sizes-grid').innerHTML = sizeHtml;
+
+    // Progress dots
+    const dots = document.getElementById('progress-dots');
+    dots.innerHTML = mfgOps.map((_, i) =>
+      `<div class="dot ${i < currentOpIndex ? 'done' : i === currentOpIndex ? 'active' : ''}"></div>`
+    ).join('');
+
+    // Nav buttons
+    document.getElementById('btn-prev').disabled = currentOpIndex === 0;
+    document.getElementById('btn-next').disabled = currentOpIndex >= mfgOps.length - 1;
+  }
+
+  function navigate(dir) {
+    const next = currentOpIndex + dir;
+    if (next < 0 || next >= mfgOps.length) return;
+    currentOpIndex = next;
+    // Reset timer
+    if (running) toggleTimer();
+    secs = 0;
+    document.getElementById('timer').textContent = '00:00:00';
+    renderOp();
+  }
 
   function toggleTimer() {
     const btn = document.getElementById('start-btn');
@@ -524,9 +783,11 @@
       btn.innerHTML = '▶ Folytatás';
       btn.classList.remove('running');
       clearInterval(iv);
-      document.getElementById('timer').classList.remove('timer-running');
+      disp.classList.remove('timer-running');
     }
   }
+
+  init();
 </script>
 </body>
 </html>
