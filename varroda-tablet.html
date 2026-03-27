@@ -725,7 +725,6 @@
 
     document.getElementById('op-num').textContent = currentOpIndex + 1;
     document.getElementById('op-title').textContent = op.name;
-    document.getElementById('op-sub').textContent = `M-22 · Op ${currentOpIndex + 1} / ${mfgOps.length}`;
     const desc = op.description || '';
     const extra = op.extra_info || '';
     document.getElementById('desc-row-main').style.display = desc ? '' : 'none';
