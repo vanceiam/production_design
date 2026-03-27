@@ -278,7 +278,7 @@ def get_production_op(op_id):
             placeholders = ','.join(['%s'] * len(product_ids))
             cur.execute(f'''
                 SELECT
-                    pmo.id, pmo.product_id, pmo.order, pmo.time, pmo.description as pmo_description, pmo.type,
+                    pmo.id, pmo.product_id, pmo.order, pmo.time, pmo.description as pmo_description, pmo.extra_info, pmo.type,
                     mo.id as mo_id, mo.name as op_name, mo.sort_description,
                     v.path as video_path, v.name as video_name
                 FROM product_manufacturing_operations pmo
@@ -302,6 +302,7 @@ def get_production_op(op_id):
                         'order': r['order'],
                         'name': r['op_name'],
                         'description': r['pmo_description'],
+                        'extra_info': r['extra_info'] if r['extra_info'] else None,
                         'sort_description': r['sort_description'],
                         'time_sec': r['time'],
                         'type': r['type'],

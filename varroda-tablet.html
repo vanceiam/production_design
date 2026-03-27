@@ -488,6 +488,10 @@
           <div class="op-desc-tag">Leírás</div>
           <div class="op-desc-text main" id="op-desc-main">–</div>
         </div>
+        <div class="op-desc-row" id="desc-row-extra" style="display:none;margin-top:6px;">
+          <div class="op-desc-tag">Extra info</div>
+          <div class="op-desc-text" id="op-desc-extra">–</div>
+        </div>
         <div id="desc-empty" style="font-size:13px;color:var(--gray-400);font-style:italic">Nincs leírás</div>
         <div id="materials-section" style="display:none;margin-top:10px;">
           <div class="op-desc-tag" style="margin-bottom:6px;">Alapanyagok</div>
@@ -715,9 +719,12 @@
     document.getElementById('op-title').textContent = op.name;
     document.getElementById('op-sub').textContent = `M-22 · Op ${currentOpIndex + 1} / ${mfgOps.length}`;
     const desc = op.description || '';
+    const extra = op.extra_info || '';
     document.getElementById('desc-row-main').style.display = desc ? '' : 'none';
-    document.getElementById('desc-empty').style.display = desc ? 'none' : '';
+    document.getElementById('desc-row-extra').style.display = extra ? '' : 'none';
+    document.getElementById('desc-empty').style.display = (desc || extra) ? 'none' : '';
     document.getElementById('op-desc-main').textContent = desc;
+    document.getElementById('op-desc-extra').textContent = extra;
 
     const timeSec = op.time_sec || 0;
     document.getElementById('op-time').textContent = timeSec || '–';
