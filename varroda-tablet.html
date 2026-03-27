@@ -454,7 +454,7 @@
     <div class="card">
       <div class="card-lbl">Termék</div>
       <div class="product-img">
-        <img id="prod-img" src="https://vivienvance.prodyflow.com/storage/product/1095/K%C3%A9p%209.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👗'" alt="M-22">
+        <img id="prod-img" src="" style="display:none" onerror="this.style.display='none'" alt="M-22">
       </div>
       <div class="product-serial" style="font-size:22px;margin-top:8px;">M-22</div>
 
@@ -623,7 +623,9 @@
       const imgRes = await fetch(`${API}/api/product/${PRODUCT_ID}/images`);
       const imgs = await imgRes.json();
       if (imgs && imgs.length > 0) {
-        document.getElementById('prod-img').src = imgs[0].url;
+        const pi = document.getElementById('prod-img');
+        pi.src = imgs[0].url;
+        pi.style.display = '';
       }
     } catch(e) { /* fallback marad */ }
 
