@@ -240,11 +240,16 @@
   .sizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex-shrink: 0; }
   .size-item {
     background: var(--purple-light);
-    border-radius: 8px; padding: 8px 10px;
-    display: flex; justify-content: space-between; align-items: center;
+    border-radius: 8px; padding: 6px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
   }
-  .size-lbl { font-size: 13px; font-weight: 800; color: var(--purple-dark); }
-  .size-val  { font-size: 20px; font-weight: 900; color: var(--purple); }
+  .size-lbl { font-size: 11px; font-weight: 800; color: var(--purple-dark); }
+  .size-input {
+    width: 100%; font-size: 18px; font-weight: 900; color: var(--purple);
+    border: none; background: transparent; text-align: center;
+    padding: 0; outline: none;
+  }
+  .size-input:focus { background: white; border-radius: 4px; }
 
   /* ══ COL 4: Videó ══ */
   .video-wrap {
@@ -507,12 +512,19 @@
     <!-- COL 3: Idők & Méretek -->
     <div class="card">
       <div class="card-lbl">Idők &amp; Méretek</div>
-      <div class="stat-group" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div class="stat-group" style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
         <div>
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px;">Műveleti idő</div>
           <div style="font-size:26px;font-weight:900;color:var(--purple);line-height:1;">
             <span id="time-val">–</span>
-            <span style="font-size:12px;font-weight:700;color:var(--purple);opacity:.7">mp/db</span>
+            <span style="font-size:11px;font-weight:700;color:var(--purple);opacity:.7">mp/db</span>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px;">Összes db</div>
+          <div style="display:flex;align-items:center;gap:3px;justify-content:center;">
+            <span style="font-size:22px;font-weight:900;color:var(--orange);line-height:1;" id="total-qty-display">–</span>
+            <span style="font-size:10px;color:var(--gray-400);font-weight:600;">db</span>
           </div>
         </div>
         <div style="text-align:right;">
@@ -520,20 +532,9 @@
           <div style="font-size:26px;font-weight:900;color:var(--purple);line-height:1;" id="target-time">–</div>
         </div>
       </div>
-      <div style="margin-top:8px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px;">Darabszám</div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <input type="number" id="custom-qty" min="1" value="160"
-            style="width:90px;font-size:22px;font-weight:900;color:var(--orange);border:2px solid #FED7AA;border-radius:8px;padding:4px 8px;background:var(--orange-light);text-align:center;"
-            oninput="recalcTarget()" />
-          <span style="font-size:11px;color:var(--gray-400);font-weight:600;">db</span>
-        </div>
-      </div>
       <div class="divider"></div>
       <div class="card-lbl" style="margin-bottom:6px">Méret bontás</div>
-      <div class="sizes-grid" id="sizes-grid">
-        <div class="size-item"><span class="size-lbl">–</span><span class="size-val">–</span></div>
-      </div>
+      <div class="sizes-grid" id="sizes-grid"></div>
     </div>
 
     <!-- COL 4: Videó -->
@@ -556,7 +557,10 @@
       <div class="timer-box">
         <div class="timer-lbl">Eltelt idő</div>
         <div class="timer-val" id="timer">00:00:00</div>
-        <div class="timer-target">Cél: <strong id="target-time-btn">–</strong></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--gray-200);">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:3px;">Cél idő</div>
+          <div style="font-size:22px;font-weight:900;color:var(--purple);line-height:1;" id="target-time-btn">–</div>
+        </div>
       </div>
       <div class="spacer"></div>
       <button class="problem-btn">⚠ Időprobléma</button>
@@ -667,10 +671,7 @@
     selectedColor = color;
     document.getElementById('btn-black').classList.toggle('active', color === 'black');
     document.getElementById('btn-red').classList.toggle('active', color === 'red');
-    document.getElementById('custom-qty').value = COLORS[color].qty;
 
-    // Update size badges
-    const sizes = COLORS[color].sizes;
     const SLABELS = ['XS','S','M','L','XL'];
     document.getElementById('size-badges').innerHTML =
       SLABELS.map(s => `<span class="size-badge highlight">${s}</span>`).join('');
@@ -678,11 +679,20 @@
     if (currentWorker) loadOps();
   }
 
-  function recalcTarget() {
-    const qty = parseInt(document.getElementById('custom-qty').value) || 0;
+  function recalcFromSizes() {
+    const SLABELS = ['XS','S','M','L','XL'];
+    let total = 0;
+    SLABELS.forEach(s => {
+      const el = document.getElementById(`size-${s.toLowerCase()}`);
+      if (el) total += parseInt(el.value) || 0;
+    });
+    const totalEl = document.getElementById('total-qty-display');
+    if (totalEl) totalEl.textContent = total || '–';
+    document.getElementById('op-qty').textContent = total;
+
     const op = mfgOps[currentOpIndex];
     const timeSec = op ? (op.time_sec || 0) : 0;
-    const targetMin = timeSec && qty ? Math.round(timeSec * qty / 60) : 0;
+    const targetMin = timeSec && total ? Math.round(timeSec * total / 60) : 0;
     const targetStr = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p` : '–';
     document.getElementById('target-time').textContent = targetStr;
     document.getElementById('target-time-btn').textContent = targetStr;
@@ -706,11 +716,7 @@
     document.getElementById('time-val').textContent = timeSec || '–';
     document.getElementById('op-qty').textContent = color.qty;
 
-    const customQty = parseInt(document.getElementById('custom-qty').value) || color.qty;
-    const targetMin = timeSec && customQty ? Math.round(timeSec * customQty / 60) : 0;
-    const targetStr = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p` : '–';
-    document.getElementById('target-time').textContent = targetStr;
-    document.getElementById('target-time-btn').textContent = targetStr;
+    recalcFromSizes();
 
     // Alapanyagok
     const materials = op.materials || [];
@@ -752,12 +758,17 @@
       indicator.textContent = '▶ Nincs videó ehhez a művelethez';
     }
 
-    // Méretek
+    // Méretek – szerkeszthető inputok
     const sizes = color.sizes;
     document.getElementById('sizes-grid').innerHTML =
       Object.entries(sizes).map(([s, q]) =>
-        `<div class="size-item"><span class="size-lbl">${s}</span><span class="size-val">${q}</span></div>`
+        `<div class="size-item">
+          <span class="size-lbl">${s}</span>
+          <input type="number" class="size-input" id="size-${s.toLowerCase()}"
+            value="${q}" min="0" oninput="recalcFromSizes()" />
+        </div>`
       ).join('');
+    recalcFromSizes();
 
     // Progress
     document.getElementById('progress-dots').innerHTML =
