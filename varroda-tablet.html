@@ -737,13 +737,15 @@
     const videoWrap = document.getElementById('video-wrap');
     const indicator = document.getElementById('video-indicator');
     if (driveId) {
-      videoWrap.innerHTML = `
-        <div class="video-play-overlay" onclick="loadVideo('${driveId}', this)">
-          <div class="video-play-circle">▶</div>
-          <div class="video-play-lbl">Videó lejátszása</div>
-        </div>`;
+      const localUrl = `/videos/${driveId}.mp4`;
+      videoWrap.innerHTML = `<video
+        src="${localUrl}"
+        style="width:100%;height:100%;border-radius:10px;object-fit:contain;background:#000;"
+        controls autoplay muted playsinline
+        onerror="this.parentElement.innerHTML='<div class=\\'no-video-wrap\\'><div class=\\'icon\\'>⚠️</div><div class=\\'txt\\'>Videó nem elérhető</div></div>'"
+      ></video>`;
       indicator.className = 'video-indicator has-video';
-      indicator.textContent = '▶ Videó elérhető – koppintásra indul';
+      indicator.textContent = '▶ Videó betöltve';
     } else {
       videoWrap.innerHTML = `<div class="no-video-wrap"><div class="icon">🎬</div><div class="txt">Nincs videó</div></div>`;
       indicator.className = 'video-indicator no-video';
@@ -766,14 +768,6 @@
 
     document.getElementById('btn-prev').disabled = currentOpIndex === 0;
     document.getElementById('btn-next').disabled = currentOpIndex >= mfgOps.length - 1;
-  }
-
-  function loadVideo(driveId, overlayEl) {
-    const wrap = overlayEl.parentElement;
-    wrap.innerHTML = `<iframe
-      src="https://drive.google.com/file/d/${driveId}/preview?autoplay=1"
-      style="width:100%;height:100%;border:none;border-radius:10px;"
-      allow="autoplay; fullscreen" allowfullscreen></iframe>`;
   }
 
   function navigate(dir) {
