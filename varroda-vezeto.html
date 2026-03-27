@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varroda – Vezető nézet</title>
+<style>
+  :root {
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --purple-dark: #5B21B6;
+    --orange: #F97316;
+    --orange-light: #FFF7ED;
+    --green: #22C55E;
+    --red: #EF4444;
+    --yellow: #EAB308;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    --sidebar-w: 56px;
+    --worker-col: 160px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: #1E1B4B;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 12px 0; gap: 4px;
+    flex-shrink: 0; z-index: 10;
+  }
+  .s-logo {
+    width: 36px; height: 36px;
+    background: var(--orange); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+    color: white; font-weight: 800; font-size: 16px;
+  }
+  .s-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #A5B4FC; font-size: 17px;
+    transition: all .2s;
+  }
+  .s-icon:hover  { background: rgba(255,255,255,0.1); color: white; }
+  .s-icon.active { background: var(--purple); color: white; }
+  .s-icon.bottom { margin-top: auto; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: white;
+    height: 58px; padding: 0 20px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+  }
+  .tb-search {
+    flex: 1; max-width: 300px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--gray-100); border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; color: var(--gray-400);
+    border: 1px solid var(--gray-200);
+  }
+  .tb-date, .tb-store {
+    padding: 7px 14px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px; font-size: 13px; color: var(--gray-700);
+    cursor: pointer;
+  }
+  .tb-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--orange));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 12px;
+    margin-left: auto;
+  }
+
+  /* ── SCHEDULER ── */
+  .scheduler {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* Header row */
+  .sched-header {
+    display: flex; background: white;
+    border-bottom: 2px solid var(--gray-200);
+    flex-shrink: 0;
+  }
+  .sh-workers {
+    width: var(--worker-col); min-width: var(--worker-col);
+    padding: 10px 14px;
+    font-size: 11px; font-weight: 700; color: var(--gray-400);
+    text-transform: uppercase; letter-spacing: .5px;
+    border-right: 2px solid var(--gray-200);
+  }
+  .sh-day {
+    flex: 1; padding: 10px 14px;
+    border-right: 1px solid var(--gray-200);
+  }
+  .sh-day:last-child { border-right: none; }
+  .sh-day-name {
+    font-size: 13px; font-weight: 700; color: var(--gray-700);
+    margin-bottom: 2px;
+  }
+  .sh-day-name.today { color: var(--purple); }
+  .sh-day-cap {
+    font-size: 11px; color: var(--gray-400);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .cap-badge {
+    background: var(--purple-light); color: var(--purple);
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 11px; font-weight: 700;
+  }
+
+  /* Body */
+  .sched-body {
+    flex: 1; overflow-y: auto; background: var(--gray-50);
+  }
+
+  /* Worker row */
+  .w-row {
+    display: flex;
+    border-bottom: 1px solid var(--gray-200);
+    min-height: 80px; background: white;
+    transition: background .15s;
+  }
+  .w-row:hover { background: #FAFAFF; }
+
+  /* Worker cell */
+  .w-cell {
+    width: var(--worker-col); min-width: var(--worker-col);
+    padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px;
+    border-right: 2px solid var(--gray-200);
+    flex-shrink: 0; background: white;
+  }
+  .w-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: white;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px white, 0 0 0 3.5px var(--gray-200);
+  }
+  .w-name { font-size: 12px; font-weight: 600; color: var(--gray-700); line-height: 1.3; }
+  .w-status { font-size: 10px; color: var(--gray-400); margin-top: 1px; }
+
+  /* Day cell — cards SIDE BY SIDE */
+  .d-cell {
+    flex: 1; padding: 6px;
+    border-right: 1px solid var(--gray-200);
+    display: flex; flex-direction: row;
+    gap: 5px; align-items: stretch;
+    min-height: 80px;
+  }
+  .d-cell:last-child { border-right: none; }
+  .d-cell.today { background: #FFFBEB; }
+
+  /* ── TASK CARDS ── */
+  .tc {
+    background: white;
+    border: 1.5px solid var(--gray-200);
+    border-left: 3px solid var(--purple);
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: box-shadow .15s, border-color .15s;
+    flex: 1; min-width: 80px;
+    display: flex; flex-direction: column;
+    justify-content: center; gap: 3px;
+    position: relative;
+  }
+  .tc:hover { box-shadow: 0 3px 12px rgba(124,58,237,0.13); border-color: var(--purple); z-index: 1; }
+  .tc.or  { border-left-color: var(--orange); }
+  .tc.or:hover { box-shadow: 0 3px 12px rgba(249,115,22,0.13); border-color: var(--orange); }
+  .tc.gr  { border-left-color: var(--green); }
+  .tc.gr:hover { box-shadow: 0 3px 12px rgba(34,197,94,0.13); border-color: var(--green); }
+  .tc.done { opacity: .52; }
+
+  .tc-h { font-size: 13px; font-weight: 800; color: var(--purple); line-height: 1; }
+  .tc.or .tc-h { color: var(--orange); }
+  .tc.gr .tc-h { color: var(--green); }
+  .tc-m { font-size: 10px; font-weight: 600; color: var(--gray-500); line-height: 1.45; }
+
+  /* Status dot */
+  .tc-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+  }
+  .tc-dot.pend  { background: var(--yellow); }
+  .tc-dot.late  { background: var(--red); }
+  .tc-dot.done2 { background: var(--gray-300); }
+
+  /* BIG card: product thumb + info */
+  .tc.big {
+    flex: 2.2;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .tc-thumb {
+    width: 46px; height: 46px;
+    border-radius: 8px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .tc-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .tc-info .tc-h  { font-size: 14px; }
+  .tc-info .tc-nm {
+    font-size: 11px; font-weight: 700; color: var(--gray-800);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ── MODAL ── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none; align-items: center; justify-content: center;
+    z-index: 500; backdrop-filter: blur(2px);
+  }
+  .overlay.open { display: flex; }
+
+  .modal {
+    background: white; border-radius: 16px;
+    width: 900px; max-width: 95vw; max-height: 90vh;
+    overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  }
+
+  .modal-hdr {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #1E1B4B, var(--purple));
+    color: white; display: flex; align-items: center; gap: 12px;
+  }
+  .modal-hdr-icon {
+    width: 42px; height: 42px;
+    background: rgba(255,255,255,0.15); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .modal-hdr-title { font-size: 15px; font-weight: 700; }
+  .modal-hdr-sub   { font-size: 12px; opacity: .75; margin-top: 2px; }
+  .modal-nav { display: flex; gap: 6px; margin-left: auto; margin-right: 6px; }
+  .modal-nav-btn, .modal-close {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
+    color: white; cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  .modal-nav-btn:hover, .modal-close:hover { background: rgba(255,255,255,0.28); }
+
+  .modal-body {
+    display: grid; grid-template-columns: 200px 1fr 220px;
+    flex: 1; overflow: hidden;
+  }
+  .modal-col {
+    padding: 16px;
+    border-right: 1px solid var(--gray-200);
+    overflow-y: auto;
+  }
+  .modal-col:last-child { border-right: none; }
+
+  .lbl {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: var(--gray-400); margin-bottom: 8px;
+  }
+
+  /* Product images */
+  .prod-main {
+    width: 100%; aspect-ratio: 1;
+    background: var(--gray-100); border-radius: 10px;
+    border: 1px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px; margin-bottom: 8px; cursor: pointer;
+  }
+  .prod-thumbs { display: flex; gap: 6px; }
+  .prod-thumb {
+    flex: 1; aspect-ratio: 1;
+    background: var(--gray-100); border-radius: 8px;
+    border: 1.5px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer; transition: border-color .2s;
+  }
+  .prod-thumb:hover { border-color: var(--purple); }
+  .prod-name { font-size: 13px; font-weight: 700; color: var(--gray-900); margin-top: 10px; }
+  .prod-code { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+  /* Team list */
+  .team-list { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
+  .team-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px; background: var(--gray-50);
+    border: 1px solid var(--gray-200); border-radius: 8px;
+  }
+  .team-av {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .team-nm { font-size: 12px; font-weight: 600; flex: 1; color: var(--gray-700); }
+  .team-t  { font-size: 12px; font-weight: 700; color: var(--purple); }
+
+  /* Op info */
+  .op-num-large {
+    font-size: 36px; font-weight: 900; color: var(--purple); line-height: 1;
+  }
+  .op-title-lg { font-size: 18px; font-weight: 800; color: var(--gray-900); margin-top: 4px; }
+  .op-desc-txt { font-size: 12px; color: var(--gray-500); line-height: 1.65; margin-top: 8px; }
+
+  .divider { height: 1px; background: var(--gray-100); margin: 12px 0; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .stat-box {
+    border-radius: 10px; padding: 10px; text-align: center;
+  }
+  .stat-box.pu { background: var(--purple-light); }
+  .stat-box.or { background: var(--orange-light); }
+  .stat-box.gn { background: #F0FDF4; }
+  .stat-v { font-size: 20px; font-weight: 900; }
+  .stat-box.pu .stat-v { color: var(--purple); }
+  .stat-box.or .stat-v { color: var(--orange); }
+  .stat-box.gn .stat-v { color: var(--green); }
+  .stat-l { font-size: 9px; font-weight: 700; color: var(--gray-400);
+            text-transform: uppercase; letter-spacing: .4px; margin-top: 2px; }
+
+  .sizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .size-item {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 8px; padding: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .size-lbl { font-size: 11px; font-weight: 700; color: var(--gray-500); }
+  .size-val { font-size: 14px; font-weight: 800; color: var(--gray-900); }
+
+  .mat-list { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+  .mat-tag {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 10px; background: var(--purple-light);
+    border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--purple-dark);
+  }
+
+  .video-box {
+    background: #0F0A2A; border-radius: 10px;
+    aspect-ratio: 16/9;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; margin-top: 4px;
+  }
+  .video-play {
+    width: 46px; height: 46px;
+    background: rgba(255,255,255,0.15); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: white;
+    border: 2px solid rgba(255,255,255,0.3); transition: all .2s;
+  }
+  .video-box:hover .video-play { background: rgba(255,255,255,0.26); transform: scale(1.1); }
+  .video-caption { position: absolute; bottom: 8px; left: 10px; color: rgba(255,255,255,.55); font-size: 10px; }
+
+  /* Right col */
+  .order-fields { display: flex; flex-direction: column; gap: 8px; }
+  .order-field {
+    padding: 10px 12px;
+    background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px;
+  }
+  .order-fl { font-size: 10px; color: var(--gray-400); font-weight: 600;
+              text-transform: uppercase; letter-spacing: .4px; }
+  .order-fv { font-size: 13px; font-weight: 700; color: var(--gray-900); margin-top: 3px; }
+
+  .modal-start-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--green), #16A34A);
+    border: none; border-radius: 10px; color: white;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all .2s; margin-top: 12px;
+  }
+  .modal-start-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(34,197,94,0.3); }
+  .timer-disp {
+    font-size: 24px; font-weight: 800; text-align: center;
+    color: var(--gray-900); background: var(--gray-50);
+    border: 2px solid var(--gray-200); border-radius: 10px;
+    padding: 12px; letter-spacing: 2px; margin-top: 8px;
+  }
+  .problem-btn {
+    width: 100%; padding: 10px; margin-top: 8px;
+    background: white; border: 2px solid var(--red);
+    border-radius: 10px; color: var(--red);
+    font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s;
+  }
+  .problem-btn:hover { background: #FEF2F2; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="s-logo">P</div>
+  <div class="s-icon">📊</div>
+  <div class="s-icon active">🔄</div>
+  <div class="s-icon">🗑</div>
+  <div class="s-icon">ℹ</div>
+  <div class="s-icon">📦</div>
+  <div class="s-icon">📈</div>
+  <div class="s-icon bottom">✂</div>
+  <div class="s-icon">📋</div>
+  <div class="s-icon">🔔</div>
+  <div class="s-icon">👤</div>
+  <div class="s-icon">👥</div>
+  <div class="s-icon" style="margin-top:auto">⚙</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-search">🔍 Termék neve, cikkszám...</div>
+    <div class="tb-date">📅 Február 20, 2025 – Február 20, 2026</div>
+    <div class="tb-store">🏠 Összes raktár ▾</div>
+    <div class="tb-avatar">MV</div>
+  </div>
+
+  <!-- SCHEDULER -->
+  <div class="scheduler">
+
+    <!-- Header -->
+    <div class="sched-header">
+      <div class="sh-workers">Varrónő</div>
+      <div class="sh-day">
+        <div class="sh-day-name today">📅 Ma (Márc 27)</div>
+        <div class="sh-day-cap"><span class="cap-badge">8 óra</span> napi kapacitás</div>
+      </div>
+      <div class="sh-day">
+        <div class="sh-day-name">Márc 28 (Péntek)</div>
+        <div class="sh-day-cap"><span class="cap-badge">8 óra</span> napi kapacitás</div>
+      </div>
+      <div class="sh-day">
+        <div class="sh-day-name">Márc 31 (Hétfő)</div>
+        <div class="sh-day-cap"><span class="cap-badge">8 óra</span> napi kapacitás</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="sched-body">
+
+      <!-- Worker 1: Kovács Veronika -->
+      <div class="w-row">
+        <div class="w-cell">
+          <div class="w-avatar" style="background:linear-gradient(135deg,#7C3AED,#5B21B6)">KV</div>
+          <div>
+            <div class="w-name">Kovács Veronika</div>
+            <div class="w-status">● Aktív</div>
+          </div>
+        </div>
+        <div class="d-cell today">
+          <div class="tc big" onclick="openModal()">
+            <div class="tc-dot pend"></div>
+            <div class="tc-thumb">👗</div>
+            <div class="tc-info">
+              <div class="tc-h">5.3 óra</div>
+              <div class="tc-nm">Csomagolás</div>
+              <div class="tc-m">M-13 / Op 27</div>
+            </div>
+          </div>
+          <div class="tc or done" onclick="openModal()">
+            <div class="tc-dot done2"></div>
+            <div class="tc-h">2.7 óra</div>
+            <div class="tc-m">M-11 / Op 14<br>Varrás</div>
+          </div>
+        </div>
+        <div class="d-cell">
+          <div class="tc" onclick="openModal()">
+            <div class="tc-dot"></div>
+            <div class="tc-h">4.0 óra</div>
+            <div class="tc-m">M-13 / Op 31<br>Ellenőrzés</div>
+          </div>
+        </div>
+        <div class="d-cell">
+          <div class="tc or" onclick="openModal()">
+            <div class="tc-dot pend"></div>
+            <div class="tc-h">6.0 óra</div>
+            <div class="tc-m">M-15 / Op 8<br>Varrás</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worker 2: Nagy Szilvia -->
+      <div class="w-row">
+        <div class="w-cell">
+          <div class="w-avatar" style="background:linear-gradient(135deg,#F97316,#EA580C)">NS</div>
+          <div>
+            <div class="w-name">Nagy Szilvia</div>
+            <div class="w-status">● Aktív</div>
+          </div>
+        </div>
+        <div class="d-cell today">
+          <div class="tc or" onclick="openModal()">
+            <div class="tc-dot pend"></div>
+            <div class="tc-h">5.3 óra</div>
+            <div class="tc-m">M-13 / Op 29</div>
+          </div>
+          <div class="tc or big" style="flex:2" onclick="openModal()">
+            <div class="tc-thumb" style="background:#FFF7ED;border-color:#FED7AA">👔</div>
+            <div class="tc-info">
+              <div class="tc-h">5.3 óra</div>
+              <div class="tc-nm">Befejező varrás</div>
+              <div class="tc-m">M-13 / Op 29</div>
+            </div>
+          </div>
+        </div>
+        <div class="d-cell">
+          <div class="tc" onclick="openModal()">
+            <div class="tc-dot pend"></div>
+            <div class="tc-h">5.3 óra</div>
+            <div class="tc-m">M-13 / Op 29<br>Befejező varrás</div>
+          </div>
+        </div>
+        <div class="d-cell"></div>
+      </div>
+
+      <!-- Worker 3: Horváth Mária -->
+      <div class="w-row">
+        <div class="w-cell">
+          <div class="w-avatar" style="background:linear-gradient(135deg,#22C55E,#16A34A)">HM</div>
+          <div>
+            <div class="w-name">Horváth Mária</div>
+            <div class="w-status">● Aktív</div>
+          </div>
+        </div>
+        <div class="d-cell today">
+          <div class="tc gr" onclick="openModal()">
+            <div class="tc-dot" style="background:var(--green)"></div>
+            <div class="tc-h">3.5 óra</div>
+            <div class="tc-m">M-12 / Op 15<br>Szabás</div>
+          </div>
+          <div class="tc" onclick="openModal()">
+            <div class="tc-dot pend"></div>
+            <div class="tc-h">4.5 óra</div>
+            <div class="tc-m">M-13 / Op 27<br>Csomagolás</div>
+          </div>
+        </div>
+        <div class="d-cell">
+          <div class="tc or" onclick="openModal()">
+            <div class="tc-dot"></div>
+            <div class="tc-h">8.0 óra</div>
+            <div class="tc-m">M-14 / Op 3<br>Összevarrás</div>
+          </div>
+        </div>
+        <div class="d-cell"></div>
+      </div>
+
+      <!-- Worker 4: Tóth Katalin -->
+      <div class="w-row">
+        <div class="w-cell">
+          <div class="w-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">TK</div>
+          <div>
+            <div class="w-name">Tóth Katalin</div>
+            <div class="w-status">⏸ Szünet</div>
+          </div>
+        </div>
+        <div class="d-cell today"></div>
+        <div class="d-cell">
+          <div class="tc" onclick="openModal()">
+            <div class="tc-dot pend"></div>
+            <div class="tc-h">7.0 óra</div>
+            <div class="tc-m">M-13 / Op 27<br>Csomagolás</div>
+          </div>
+        </div>
+        <div class="d-cell"></div>
+      </div>
+
+      <!-- Worker 5: Fekete Erika -->
+      <div class="w-row">
+        <div class="w-cell">
+          <div class="w-avatar" style="background:linear-gradient(135deg,#EC4899,#BE185D)">FE</div>
+          <div>
+            <div class="w-name">Fekete Erika</div>
+            <div class="w-status">● Aktív</div>
+          </div>
+        </div>
+        <div class="d-cell today">
+          <div class="tc" onclick="openModal()">
+            <div class="tc-dot"></div>
+            <div class="tc-h">6.0 óra</div>
+            <div class="tc-m">M-16 / Op 5<br>Szegés</div>
+          </div>
+        </div>
+        <div class="d-cell"></div>
+        <div class="d-cell">
+          <div class="tc gr" onclick="openModal()">
+            <div class="tc-dot" style="background:var(--green)"></div>
+            <div class="tc-h">5.5 óra</div>
+            <div class="tc-m">M-13 / Op 12<br>Minőségellenőrzés</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sched-body -->
+  </div><!-- /scheduler -->
+</div><!-- /main -->
+
+
+<!-- ══ OPERATION MODAL ══ -->
+<div class="overlay" id="overlay" onclick="closeOvl(event)">
+  <div class="modal">
+
+    <div class="modal-hdr">
+      <div class="modal-hdr-icon">✂</div>
+      <div>
+        <div class="modal-hdr-title">Op #27 · Csomagolás · M-13 Black N-33</div>
+        <div class="modal-hdr-sub">BU181579-31 · Kovács Veronika · Március 27, 2026</div>
+      </div>
+      <div class="modal-nav">
+        <button class="modal-nav-btn">←</button>
+        <button class="modal-nav-btn">→</button>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- LEFT: Product + Team -->
+      <div class="modal-col">
+        <div class="lbl">Termék képek</div>
+        <div class="prod-main">👗</div>
+        <div class="prod-thumbs">
+          <div class="prod-thumb">📸</div>
+          <div class="prod-thumb">🖼</div>
+          <div class="prod-thumb">📷</div>
+        </div>
+        <div class="prod-name">N-33 · Black</div>
+        <div class="prod-code">Modell: M-13 · Op. 27</div>
+
+        <div class="divider"></div>
+        <div class="lbl">Csapat idők</div>
+        <div class="team-list">
+          <div class="team-item">
+            <div class="team-av" style="background:linear-gradient(135deg,#7C3AED,#5B21B6)">KV</div>
+            <div class="team-nm">Kovács V.</div>
+            <div class="team-t">76s</div>
+          </div>
+          <div class="team-item">
+            <div class="team-av" style="background:linear-gradient(135deg,#F97316,#EA580C)">NS</div>
+            <div class="team-nm">Nagy Sz.</div>
+            <div class="team-t">80s</div>
+          </div>
+          <div class="team-item">
+            <div class="team-av" style="background:linear-gradient(135deg,#22C55E,#16A34A)">HM</div>
+            <div class="team-nm">Horváth M.</div>
+            <div class="team-t">89s</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDDLE: Op info + sizes + materials + video -->
+      <div class="modal-col">
+        <div class="op-num-large">27</div>
+        <div class="op-title-lg">Csomagolás</div>
+        <div class="op-desc-txt">Termék összehajtogatása és csomagolása megadott méret szerint. Figyelni kell a méretcímkékre és a rendelési azonosítóra.</div>
+
+        <div class="divider"></div>
+        <div class="stats-row">
+          <div class="stat-box pu"><div class="stat-v">70<small style="font-size:11px">mp</small></div><div class="stat-l">Idő/db</div></div>
+          <div class="stat-box or"><div class="stat-v">270</div><div class="stat-l">Darab</div></div>
+          <div class="stat-box gn"><div class="stat-v">228<small style="font-size:11px">p</small></div><div class="stat-l">Kész</div></div>
+        </div>
+
+        <div class="lbl">Méretek</div>
+        <div class="sizes-grid">
+          <div class="size-item"><span class="size-lbl">S</span><span class="size-val">100</span></div>
+          <div class="size-item"><span class="size-lbl">M</span><span class="size-val">70</span></div>
+          <div class="size-item"><span class="size-lbl">L</span><span class="size-val">30</span></div>
+          <div class="size-item"><span class="size-lbl">XS</span><span class="size-val">70</span></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="lbl">Szükséges anyagok</div>
+        <div class="mat-list">
+          <div class="mat-tag">📷 Fényképek</div>
+          <div class="mat-tag">🔢 Sorozatszám</div>
+          <div class="mat-tag">📛 Névtábla</div>
+          <div class="mat-tag">📐 Méretjelző</div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="lbl">Videó útmutató</div>
+        <div class="video-box">
+          <div class="video-play">▶</div>
+          <div class="video-caption">Op 27 · Csomagolás útmutató</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Order + actions -->
+      <div class="modal-col">
+        <div class="lbl">Rendelés adatok</div>
+        <div class="order-fields">
+          <div class="order-field">
+            <div class="order-fl">Rendelés ID</div>
+            <div class="order-fv">BU181579-31</div>
+          </div>
+          <div class="order-field">
+            <div class="order-fl">Létrehozva</div>
+            <div class="order-fv">2026-03-20</div>
+          </div>
+          <div class="order-field">
+            <div class="order-fl">Premier dátum</div>
+            <div class="order-fv" style="color:var(--orange)">2026-04-05</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="lbl">Eszközök</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">📦</span><span style="font-size:9px;color:var(--gray-400)">Eszköz neve</span></div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">📸</span><span style="font-size:9px;color:var(--gray-400)">Fénykép</span></div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">📋</span><span style="font-size:9px;color:var(--gray-400)">Sablon</span></div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer"><span style="font-size:20px">🔧</span><span style="font-size:9px;color:var(--gray-400)">Szerszám</span></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="lbl">Termelés vezérlés</div>
+        <button class="modal-start-btn">▶ Termelés indítása</button>
+        <div class="timer-disp">03:56:00</div>
+        <button class="problem-btn">⚠ Időprobléma jelzés</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal()  { document.getElementById('overlay').classList.add('open'); }
+  function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+  function closeOvl(e)  { if (e.target === document.getElementById('overlay')) closeModal(); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

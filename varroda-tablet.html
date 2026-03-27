@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varroda – Tabletes nézet</title>
+<style>
+  :root {
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --purple-dark: #5B21B6;
+    --orange: #F97316;
+    --orange-light: #FFF7ED;
+    --green: #22C55E;
+    --red: #EF4444;
+    --yellow: #EAB308;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    background: #EEEDF7;
+    color: var(--gray-900);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #1E1B4B, var(--purple));
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .logo {
+    width: 34px; height: 34px;
+    background: var(--orange);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; flex-shrink: 0;
+  }
+  .header-title { font-size: 15px; font-weight: 700; line-height: 1.2; }
+  .header-sub   { font-size: 10px; opacity: .7; }
+  .header-worker { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .worker-av {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: white;
+  }
+  .worker-nm  { font-size: 13px; font-weight: 600; text-align: right; }
+  .worker-rl  { font-size: 10px; opacity: .7; text-align: right; }
+
+  /* ── CONTENT ── */
+  .content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    padding: 10px;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  /* ── CENTER: 4-column grid fills full height ── */
+  .center {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr 1fr;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  /* Card base */
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .card-lbl {
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: var(--gray-400);
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  /* ══ COL 1: Product image (narrow) ══ */
+  .product-main {
+    width: 100%; aspect-ratio: 1;
+    background: var(--gray-100);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px; cursor: pointer;
+    transition: border-color .2s;
+    flex-shrink: 0;
+  }
+  .product-main:hover, .product-main.active { border-color: var(--purple); }
+  .product-name { font-size: 13px; font-weight: 800; color: var(--gray-900); margin-top: 8px; }
+  .product-code { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+
+  /* ══ COL 2: Műveleti adatok ══ */
+  .op-badge-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; flex-shrink: 0;
+  }
+  .op-num-badge {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: white; flex-shrink: 0;
+  }
+  .op-num-badge .n { font-size: 20px; font-weight: 900; line-height: 1; }
+  .op-num-badge .l { font-size: 8px; opacity: .7; }
+  .op-title { font-size: 17px; font-weight: 800; color: var(--gray-900); line-height: 1.2; }
+  .op-model { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+  .op-desc {
+    font-size: 12px; color: var(--gray-500); line-height: 1.65;
+    flex: 1; overflow-y: auto;
+  }
+  /* Materials as compact chips at the bottom of op col */
+  .mat-section { flex-shrink: 0; margin-top: 10px; }
+  .mat-lbl {
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .7px;
+    color: var(--gray-400); margin-bottom: 6px;
+  }
+  .mat-list { display: flex; flex-direction: column; gap: 5px; }
+  .mat-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px; font-weight: 600; color: var(--gray-700);
+  }
+  .mat-item-icon {
+    width: 26px; height: 26px;
+    background: var(--purple-light);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+
+  /* ══ COL 3: Idők & Méretek — LARGE numbers ══ */
+  .stat-group { flex-shrink: 0; margin-bottom: 8px; }
+  .stat-big {
+    display: flex; align-items: baseline; gap: 4px;
+    line-height: 1;
+  }
+  .stat-val   { font-size: 34px; font-weight: 900; color: var(--purple); }
+  .stat-unit  { font-size: 14px; font-weight: 700; color: var(--purple); opacity: .7; }
+  .stat-lbl   { font-size: 10px; color: var(--gray-400); font-weight: 600;
+                text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+  .stat-row {
+    display: flex; gap: 8px; margin-bottom: 8px; flex-shrink: 0;
+  }
+  .stat-pill {
+    flex: 1; padding: 8px 10px;
+    border-radius: 10px;
+    display: flex; flex-direction: column;
+  }
+  .stat-pill.orange { background: var(--orange-light); border: 1px solid #FED7AA; }
+  .stat-pill.green  { background: #F0FDF4;              border: 1px solid #BBF7D0; }
+  .stat-pill .pv    { font-size: 20px; font-weight: 900; }
+  .stat-pill.orange .pv { color: var(--orange); }
+  .stat-pill.green  .pv { color: var(--green); }
+  .stat-pill .pl    { font-size: 9px; font-weight: 700; color: var(--gray-400);
+                      text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+  .divider { height: 1px; background: var(--gray-100); margin: 8px 0; flex-shrink: 0; }
+
+  .sizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex-shrink: 0; }
+  .size-item {
+    background: var(--purple-light);
+    border-radius: 8px; padding: 8px 10px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .size-lbl { font-size: 13px; font-weight: 800; color: var(--purple-dark); }
+  .size-val { font-size: 20px; font-weight: 900; color: var(--purple); }
+
+  /* ══ COL 4: Video + product thumbs ══ */
+  .video-wrap {
+    background: #0F0A2A;
+    border-radius: 10px;
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; overflow: hidden;
+    min-height: 80px;
+  }
+  .play-btn {
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: all .2s;
+  }
+  .video-wrap:hover .play-btn { background: rgba(255,255,255,0.28); transform: scale(1.08); }
+  .video-lbl {
+    position: absolute; bottom: 8px; left: 10px;
+    color: rgba(255,255,255,0.5); font-size: 9px;
+  }
+  .thumb-row { display: flex; gap: 6px; margin-top: 8px; flex-shrink: 0; }
+  .thumb {
+    flex: 1; aspect-ratio: 1;
+    background: var(--gray-100);
+    border-radius: 8px;
+    border: 1.5px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer;
+    transition: border-color .2s;
+  }
+  .thumb:hover, .thumb.active { border-color: var(--purple); }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    width: 180px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .action-card {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    border: 1px solid var(--gray-200);
+    display: flex; flex-direction: column; gap: 10px;
+    flex: 1;
+  }
+
+  .start-btn {
+    width: 100%; padding: 16px 10px;
+    background: linear-gradient(135deg, var(--green), #16A34A);
+    border: none; border-radius: 12px;
+    color: white; font-size: 14px; font-weight: 900;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    transition: all .2s;
+    box-shadow: 0 4px 14px rgba(34,197,94,0.25);
+    letter-spacing: .2px;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(34,197,94,0.4); }
+  .start-btn.running {
+    background: linear-gradient(135deg, var(--orange), #EA580C);
+    box-shadow: 0 4px 14px rgba(249,115,22,0.3);
+  }
+
+  .timer-box {
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .timer-lbl {
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: var(--gray-400); margin-bottom: 6px;
+  }
+  .timer-val {
+    font-size: 20px; font-weight: 900;
+    color: var(--gray-900);
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .timer-target { font-size: 10px; color: var(--gray-400); margin-top: 5px; }
+  .timer-target strong { color: var(--purple); }
+
+  .spacer { flex: 1; }
+
+  .problem-btn {
+    width: 100%; padding: 13px;
+    background: white;
+    border: 2px solid var(--red);
+    border-radius: 12px;
+    color: var(--red);
+    font-size: 13px; font-weight: 800;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all .2s;
+  }
+  .problem-btn:hover { background: #FEF2F2; }
+
+  /* ── FOOTER NAV ── */
+  .footer-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: white;
+    border-top: 1px solid var(--gray-200);
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 20px;
+    border-radius: 9px;
+    border: 2px solid var(--purple);
+    background: white; color: var(--purple);
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+  }
+  .nav-btn:hover  { background: var(--purple); color: white; }
+  .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .nav-btn:disabled:hover { background: white; color: var(--purple); }
+
+  .progress-dots { display: flex; align-items: center; gap: 6px; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gray-200); transition: all .2s;
+  }
+  .dot.done   { background: var(--green); }
+  .dot.active { background: var(--purple); transform: scale(1.3); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 3px; height: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
+
+  /* Timer anim */
+  @keyframes tick {
+    from { color: var(--gray-900); }
+    to   { color: var(--purple); }
+  }
+  .timer-running { animation: tick .5s ease-in-out infinite alternate; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">P</div>
+  <div>
+    <div class="header-title">Varroda Feladatok</div>
+    <div class="header-sub">Ma: Március 27, 2026</div>
+  </div>
+  <div class="header-worker">
+    <div>
+      <div class="worker-nm">Kovács Veronika</div>
+      <div class="worker-rl">Varrónő · M-13 modell</div>
+    </div>
+    <div class="worker-av">KV</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- 4-column center grid -->
+  <div class="center">
+
+    <!-- COL 1: Termék kép -->
+    <div class="card">
+      <div class="card-lbl">Termék</div>
+      <div class="product-main active">👗</div>
+      <div class="product-name">N-33 · Black</div>
+      <div class="product-code">M-13 modell</div>
+    </div>
+
+    <!-- COL 2: Műveleti adatok + anyagok chips -->
+    <div class="card">
+      <div class="card-lbl">Műveleti adatok</div>
+      <div class="op-badge-row">
+        <div class="op-num-badge">
+          <span class="n">27</span>
+          <span class="l">Op.</span>
+        </div>
+        <div>
+          <div class="op-title">Csomagolás</div>
+          <div class="op-model">M-13 / Op 27</div>
+        </div>
+      </div>
+      <div class="op-desc">
+        Termék összehajtogatása és csomagolása megadott méret szerint. Figyelni kell a méretcímkékre és a rendelési azonosítóra. Minden darabot külön kell ellenőrizni.
+      </div>
+      <!-- Materials as small chips -->
+      <div class="mat-section">
+        <div class="mat-lbl">Szükséges anyagok</div>
+        <div class="mat-list">
+          <div class="mat-item"><div class="mat-item-icon">📷</div>Fényképek</div>
+          <div class="mat-item"><div class="mat-item-icon">🔢</div>Sorozatszám</div>
+          <div class="mat-item"><div class="mat-item-icon">📛</div>Névtábla</div>
+          <div class="mat-item"><div class="mat-item-icon">📐</div>Méretjelző</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL 3: Idők & Méretek — nagy számok -->
+    <div class="card">
+      <div class="card-lbl">Idők &amp; Méretek</div>
+
+      <!-- Op time — biggest number -->
+      <div class="stat-group">
+        <div class="stat-big">
+          <span class="stat-val">70</span>
+          <span class="stat-unit">mp/db</span>
+        </div>
+        <div class="stat-lbl">Művelet idő</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-pill orange">
+          <span class="pv">270</span>
+          <span class="pl">Darab</span>
+        </div>
+        <div class="stat-pill green">
+          <span class="pv">228p</span>
+          <span class="pl">Kész</span>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--gray-500);margin-bottom:8px;flex-shrink:0;">
+        <span style="font-weight:700;color:var(--gray-700)">Cél idő:</span> 5ó 15p / 315p
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-lbl" style="margin-bottom:6px">Méretek</div>
+      <div class="sizes-grid">
+        <div class="size-item"><span class="size-lbl">S</span><span class="size-val">100</span></div>
+        <div class="size-item"><span class="size-lbl">M</span><span class="size-val">70</span></div>
+        <div class="size-item"><span class="size-lbl">L</span><span class="size-val">30</span></div>
+        <div class="size-item"><span class="size-lbl">XS</span><span class="size-val">70</span></div>
+      </div>
+    </div>
+
+    <!-- COL 4: Videó + mini termék képek -->
+    <div class="card">
+      <div class="card-lbl">Videó útmutató</div>
+      <div class="video-wrap">
+        <div class="play-btn">▶</div>
+        <div class="video-lbl">Op 27 · Csomagolás</div>
+      </div>
+      <div class="thumb-row">
+        <div class="thumb active">👗</div>
+        <div class="thumb">📸</div>
+        <div class="thumb">🖼</div>
+      </div>
+    </div>
+
+  </div><!-- /center -->
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="action-card">
+
+      <button class="start-btn" id="start-btn" onclick="toggleTimer()">
+        ▶ Termelés indítása
+      </button>
+
+      <div class="timer-box">
+        <div class="timer-lbl">Eltelt idő</div>
+        <div class="timer-val" id="timer">00:00:00</div>
+        <div class="timer-target">Cél: <strong>5ó 15p</strong></div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <button class="problem-btn">⚠ Időprobléma</button>
+
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- FOOTER NAV -->
+<div class="footer-nav">
+  <button class="nav-btn" disabled>← Előző</button>
+  <div class="progress-dots">
+    <div class="dot done"></div>
+    <div class="dot done"></div>
+    <div class="dot active"></div>
+    <div class="dot"></div>
+  </div>
+  <button class="nav-btn">Következő →</button>
+</div>
+
+<script>
+  let running = false, secs = 0, iv = null;
+
+  function toggleTimer() {
+    const btn = document.getElementById('start-btn');
+    const disp = document.getElementById('timer');
+    running = !running;
+    if (running) {
+      btn.innerHTML = '⏸ Megállítás';
+      btn.classList.add('running');
+      iv = setInterval(() => {
+        secs++;
+        const h = String(Math.floor(secs/3600)).padStart(2,'0');
+        const m = String(Math.floor((secs%3600)/60)).padStart(2,'0');
+        const s = String(secs%60).padStart(2,'0');
+        disp.textContent = `${h}:${m}:${s}`;
+        disp.classList.add('timer-running');
+      }, 1000);
+    } else {
+      btn.innerHTML = '▶ Folytatás';
+      btn.classList.remove('running');
+      clearInterval(iv);
+      document.getElementById('timer').classList.remove('timer-running');
+    }
+  }
+</script>
+</body>
+</html>
