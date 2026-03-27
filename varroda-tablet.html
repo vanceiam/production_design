@@ -237,19 +237,19 @@
 
   .divider { height: 1px; background: var(--gray-100); margin: 8px 0; flex-shrink: 0; }
 
-  .sizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex-shrink: 0; }
+  .sizes-grid { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
   .size-item {
     background: var(--purple-light);
-    border-radius: 8px; padding: 6px 8px;
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    border-radius: 8px; padding: 6px 10px;
+    display: flex; justify-content: space-between; align-items: center;
   }
-  .size-lbl { font-size: 11px; font-weight: 800; color: var(--purple-dark); }
+  .size-lbl { font-size: 13px; font-weight: 800; color: var(--purple-dark); }
   .size-input {
-    width: 100%; font-size: 18px; font-weight: 900; color: var(--purple);
-    border: none; background: transparent; text-align: center;
+    width: 60px; font-size: 18px; font-weight: 900; color: var(--purple);
+    border: none; background: transparent; text-align: right;
     padding: 0; outline: none;
   }
-  .size-input:focus { background: white; border-radius: 4px; }
+  .size-input:focus { background: white; border-radius: 4px; padding: 0 4px; }
 
   /* ══ COL 4: Videó ══ */
   .video-wrap {
