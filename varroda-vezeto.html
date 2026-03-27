@@ -612,12 +612,19 @@
 
   function renderRows(assignments, prodOps) {
     const body = document.getElementById('sched-body');
-    if (!assignments.length) {
+    const allWorkers = scheduleData.workers || [];
+    if (!allWorkers.length) {
       body.innerHTML = '<div style="padding:20px;color:var(--gray-400)">Nincs adat</div>';
       return;
     }
 
-    const html = assignments.map((a, wi) => {
+    // Merge workers with their assignments (workers without assignments still show)
+    const rows = allWorkers.map(w => {
+      const a = assignments.find(a => a.worker_id === w.id);
+      return a || { worker_id: w.id, worker_name: w.name, worker_initials: w.initials, ops: [] };
+    });
+
+    const html = rows.map((a, wi) => {
       const color = COLORS[wi % COLORS.length];
       const cells = prodOps.map((op, ci) => {
         // Worker's ops that exist in this production op
