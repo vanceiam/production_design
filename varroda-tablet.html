@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Varroda – Tabletes nézet</title>
+<title>Varroda – M-22</title>
 <style>
   :root {
     --purple: #7C3AED;
@@ -13,7 +13,6 @@
     --orange-light: #FFF7ED;
     --green: #22C55E;
     --red: #EF4444;
-    --yellow: #EAB308;
     --gray-50: #F9FAFB;
     --gray-100: #F3F4F6;
     --gray-200: #E5E7EB;
@@ -24,9 +23,7 @@
     --gray-800: #1F2937;
     --gray-900: #111827;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
     background: #EEEDF7;
@@ -77,16 +74,15 @@
     min-height: 0;
   }
 
-  /* ── CENTER: 4-column grid fills full height ── */
+  /* ── CENTER GRID ── */
   .center {
     flex: 1;
     display: grid;
-    grid-template-columns: 120px 1fr 1fr 1fr;
+    grid-template-columns: 130px 1fr 1fr 1fr;
     gap: 10px;
     min-width: 0;
   }
 
-  /* Card base */
   .card {
     background: white;
     border-radius: 12px;
@@ -106,26 +102,57 @@
     flex-shrink: 0;
   }
 
-  /* ══ COL 1: Product image (narrow) ══ */
-  .product-main {
-    width: 100%; aspect-ratio: 1;
+  /* ══ COL 1: Termék ══ */
+  .product-img {
+    width: 100%;
+    aspect-ratio: 1;
     background: var(--gray-100);
     border: 2px solid var(--gray-200);
     border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 42px; cursor: pointer;
-    transition: border-color .2s;
+    overflow: hidden;
     flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
   }
-  .product-main:hover, .product-main.active { border-color: var(--purple); }
-  .product-name { font-size: 13px; font-weight: 800; color: var(--gray-900); margin-top: 8px; }
-  .product-code { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
-  .prod-select {
-    margin-top: 8px; padding: 5px 6px;
-    background: var(--gray-50); border: 1px solid var(--gray-200);
-    border-radius: 7px; font-size: 10px; color: var(--gray-700);
-    cursor: pointer; width: 100%;
+  .product-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
   }
+  .product-name { font-size: 12px; font-weight: 800; color: var(--gray-900); margin-top: 8px; line-height: 1.3; }
+  .product-serial { font-size: 10px; color: var(--purple); font-weight: 700; margin-top: 2px; }
+
+  /* Szín gombok */
+  .color-label {
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .7px;
+    color: var(--gray-400); margin-top: 10px; margin-bottom: 6px;
+  }
+  .color-btns { display: flex; flex-direction: column; gap: 5px; }
+  .color-btn {
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 2px solid var(--gray-200);
+    background: white;
+    font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; gap: 7px;
+    text-align: left;
+  }
+  .color-btn:hover { border-color: var(--purple); background: var(--purple-light); }
+  .color-btn.active { border-color: var(--purple); background: var(--purple-light); color: var(--purple-dark); }
+  .color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Méret badge-ek */
+  .size-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .size-badge {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 10px; font-weight: 700;
+    color: var(--gray-600);
+  }
+  .size-badge.highlight { background: var(--purple-light); border-color: var(--purple); color: var(--purple-dark); }
 
   /* ══ COL 2: Műveleti adatok ══ */
   .op-badge-row {
@@ -143,60 +170,70 @@
   .op-num-badge .n { font-size: 20px; font-weight: 900; line-height: 1; }
   .op-num-badge .l { font-size: 8px; opacity: .7; }
   .op-title { font-size: 17px; font-weight: 800; color: var(--gray-900); line-height: 1.2; }
-  .op-model { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
-  .op-desc {
-    font-size: 12px; color: var(--gray-500); line-height: 1.65;
-    flex: 1; overflow-y: auto;
+  .op-sub   { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+  .op-desc-wrap {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
   }
-  .mat-section { flex-shrink: 0; margin-top: 10px; }
-  .mat-lbl {
-    font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .7px;
-    color: var(--gray-400); margin-bottom: 6px;
+  .op-desc-row {
+    display: flex; flex-direction: column; gap: 3px;
   }
-  .mat-list { display: flex; flex-direction: column; gap: 5px; }
-  .mat-item {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 12px; font-weight: 600; color: var(--gray-700);
+  .op-desc-tag {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .8px; color: var(--gray-400);
   }
-  .mat-item-icon {
-    width: 26px; height: 26px;
-    background: var(--purple-light);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; flex-shrink: 0;
+  .op-desc-text {
+    font-size: 14px; color: var(--gray-700); line-height: 1.55; font-weight: 500;
   }
+  .op-desc-text.main { font-size: 15px; color: var(--gray-900); font-weight: 600; }
 
-  /* ══ COL 3: Idők & Méretek ══ */
-  .stat-group { flex-shrink: 0; margin-bottom: 8px; }
-  .stat-big {
-    display: flex; align-items: baseline; gap: 4px;
-    line-height: 1;
+  .info-row {
+    display: flex; gap: 8px; margin-top: 10px; flex-shrink: 0;
   }
-  .stat-val   { font-size: 34px; font-weight: 900; color: var(--purple); }
-  .stat-unit  { font-size: 14px; font-weight: 700; color: var(--purple); opacity: .7; }
-  .stat-lbl   { font-size: 10px; color: var(--gray-400); font-weight: 600;
-                text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
-
-  .stat-row {
-    display: flex; gap: 8px; margin-bottom: 8px; flex-shrink: 0;
-  }
-  .stat-pill {
+  .info-pill {
     flex: 1; padding: 8px 10px;
     border-radius: 10px;
     display: flex; flex-direction: column;
+    background: var(--gray-50); border: 1px solid var(--gray-200);
   }
-  .stat-pill.orange { background: var(--orange-light); border: 1px solid #FED7AA; }
-  .stat-pill.green  { background: #F0FDF4;              border: 1px solid #BBF7D0; }
-  .stat-pill .pv    { font-size: 20px; font-weight: 900; }
-  .stat-pill.orange .pv { color: var(--orange); }
-  .stat-pill.green  .pv { color: var(--green); }
-  .stat-pill .pl    { font-size: 9px; font-weight: 700; color: var(--gray-400);
-                      text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+  .info-pill .pv { font-size: 18px; font-weight: 900; color: var(--gray-800); }
+  .info-pill .pl { font-size: 9px; font-weight: 700; color: var(--gray-400);
+                   text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+  .info-pill.purple { background: var(--purple-light); border-color: #C4B5FD; }
+  .info-pill.purple .pv { color: var(--purple); }
+  .info-pill.orange { background: var(--orange-light); border-color: #FED7AA; }
+  .info-pill.orange .pv { color: var(--orange); }
+
+  /* Alapanyagok */
+  .material-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 8px; padding: 6px 8px;
+  }
+  .material-img {
+    width: 36px; height: 36px; border-radius: 6px;
+    object-fit: cover; flex-shrink: 0;
+    background: var(--gray-200);
+  }
+  .material-name { font-size: 12px; font-weight: 600; color: var(--gray-800); }
+  .material-amt  { font-size: 11px; color: var(--gray-400); }
+
+  /* Videó indikátor */
+  .video-indicator {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 8px; flex-shrink: 0;
+    padding: 5px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+  }
+  .video-indicator.has-video { background: #FEF3C7; color: #92400E; }
+  .video-indicator.no-video  { background: var(--gray-100); color: var(--gray-400); }
+
+  /* ══ COL 3: Idők & Méretek ══ */
+  .stat-group { flex-shrink: 0; margin-bottom: 8px; }
+  .stat-big { display: flex; align-items: baseline; gap: 4px; line-height: 1; }
+  .stat-val  { font-size: 34px; font-weight: 900; color: var(--purple); }
+  .stat-unit { font-size: 14px; font-weight: 700; color: var(--purple); opacity: .7; }
+  .stat-lbl  { font-size: 10px; color: var(--gray-400); font-weight: 600;
+               text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
 
   .divider { height: 1px; background: var(--gray-100); margin: 8px 0; flex-shrink: 0; }
 
@@ -207,15 +244,15 @@
     display: flex; justify-content: space-between; align-items: center;
   }
   .size-lbl { font-size: 13px; font-weight: 800; color: var(--purple-dark); }
-  .size-val { font-size: 20px; font-weight: 900; color: var(--purple); }
+  .size-val  { font-size: 20px; font-weight: 900; color: var(--purple); }
 
-  /* ══ COL 4: Video + product thumbs ══ */
+  /* ══ COL 4: Videó ══ */
   .video-wrap {
     background: #0F0A2A;
     border-radius: 10px;
     flex: 1;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; position: relative; overflow: hidden;
+    position: relative; overflow: hidden;
     min-height: 80px;
   }
   .play-btn {
@@ -225,33 +262,23 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 22px; color: white;
     border: 2px solid rgba(255,255,255,0.3);
-    transition: all .2s;
   }
-  .video-wrap:hover .play-btn { background: rgba(255,255,255,0.28); transform: scale(1.08); }
   .video-lbl {
     position: absolute; bottom: 8px; left: 10px;
     color: rgba(255,255,255,0.5); font-size: 9px;
   }
-  .thumb-row { display: flex; gap: 6px; margin-top: 8px; flex-shrink: 0; }
-  .thumb {
-    flex: 1; aspect-ratio: 1;
-    background: var(--gray-100);
-    border-radius: 8px;
-    border: 1.5px solid var(--gray-200);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; cursor: pointer;
-    transition: border-color .2s;
+  .no-video-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.3);
   }
-  .thumb:hover, .thumb.active { border-color: var(--purple); }
+  .no-video-wrap .icon { font-size: 32px; }
+  .no-video-wrap .txt { font-size: 11px; }
 
   /* ── RIGHT PANEL ── */
   .right-panel {
-    width: 180px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
+    width: 180px; flex-shrink: 0;
+    display: flex; flex-direction: column;
   }
-
   .action-card {
     background: white;
     border-radius: 14px;
@@ -261,7 +288,6 @@
     display: flex; flex-direction: column; gap: 10px;
     flex: 1;
   }
-
   .start-btn {
     width: 100%; padding: 16px 10px;
     background: linear-gradient(135deg, var(--green), #16A34A);
@@ -271,43 +297,27 @@
     display: flex; align-items: center; justify-content: center; gap: 7px;
     transition: all .2s;
     box-shadow: 0 4px 14px rgba(34,197,94,0.25);
-    letter-spacing: .2px;
   }
-  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(34,197,94,0.4); }
+  .start-btn:hover { transform: translateY(-2px); }
   .start-btn.running {
     background: linear-gradient(135deg, var(--orange), #EA580C);
     box-shadow: 0 4px 14px rgba(249,115,22,0.3);
   }
-
   .timer-box {
-    background: var(--gray-50);
-    border: 2px solid var(--gray-200);
-    border-radius: 12px;
-    padding: 12px 10px;
-    text-align: center;
+    background: var(--gray-50); border: 2px solid var(--gray-200);
+    border-radius: 12px; padding: 12px 10px; text-align: center;
   }
-  .timer-lbl {
-    font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .8px;
-    color: var(--gray-400); margin-bottom: 6px;
-  }
-  .timer-val {
-    font-size: 20px; font-weight: 900;
-    color: var(--gray-900);
-    letter-spacing: 2px;
-    font-variant-numeric: tabular-nums; line-height: 1;
-  }
+  .timer-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase;
+               letter-spacing: .8px; color: var(--gray-400); margin-bottom: 6px; }
+  .timer-val { font-size: 20px; font-weight: 900; color: var(--gray-900);
+               letter-spacing: 2px; font-variant-numeric: tabular-nums; line-height: 1; }
   .timer-target { font-size: 10px; color: var(--gray-400); margin-top: 5px; }
   .timer-target strong { color: var(--purple); }
-
   .spacer { flex: 1; }
-
   .problem-btn {
     width: 100%; padding: 13px;
-    background: white;
-    border: 2px solid var(--red);
-    border-radius: 12px;
-    color: var(--red);
+    background: white; border: 2px solid var(--red);
+    border-radius: 12px; color: var(--red);
     font-size: 13px; font-weight: 800;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -317,18 +327,13 @@
 
   /* ── FOOTER NAV ── */
   .footer-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    background: white;
-    border-top: 1px solid var(--gray-200);
-    flex-shrink: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px; background: white;
+    border-top: 1px solid var(--gray-200); flex-shrink: 0;
   }
   .nav-btn {
     display: flex; align-items: center; gap: 7px;
-    padding: 9px 20px;
-    border-radius: 9px;
+    padding: 9px 20px; border-radius: 9px;
     border: 2px solid var(--purple);
     background: white; color: var(--purple);
     font-size: 13px; font-weight: 700;
@@ -337,16 +342,17 @@
   .nav-btn:hover  { background: var(--purple); color: white; }
   .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
   .nav-btn:disabled:hover { background: white; color: var(--purple); }
-
-  .progress-dots { display: flex; align-items: center; gap: 6px; }
+  .progress-center { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .progress-dots { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; max-width: 300px; justify-content: center; }
   .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--gray-200); transition: all .2s;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gray-200); transition: all .2s; flex-shrink: 0;
   }
   .dot.done   { background: var(--green); }
-  .dot.active { background: var(--purple); transform: scale(1.3); }
+  .dot.active { background: var(--purple); transform: scale(1.4); }
+  .op-counter { font-size: 11px; color: var(--gray-400); font-weight: 600; }
 
-  /* ── Worker select overlay ── */
+  /* ── Worker overlay ── */
   .worker-overlay {
     position: fixed; inset: 0;
     background: rgba(30,27,75,0.85);
@@ -357,6 +363,7 @@
   .worker-picker {
     background: white; border-radius: 20px;
     padding: 28px; min-width: 340px; max-width: 420px;
+    max-height: 80vh; overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   }
   .wp-title { font-size: 18px; font-weight: 800; color: var(--gray-900); margin-bottom: 4px; }
@@ -372,35 +379,25 @@
   .wp-av {
     width: 40px; height: 40px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 14px; color: white;
-    flex-shrink: 0;
+    font-weight: 700; font-size: 14px; color: white; flex-shrink: 0;
   }
   .wp-nm { font-size: 14px; font-weight: 700; color: var(--gray-900); }
 
-  /* Loading state */
-  .loading-msg { color: var(--gray-400); font-size: 12px; font-style: italic; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 3px; height: 3px; }
+  ::-webkit-scrollbar { width: 3px; }
   ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
-
-  @keyframes tick {
-    from { color: var(--gray-900); }
-    to   { color: var(--purple); }
-  }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
   .timer-running { animation: tick .5s ease-in-out infinite alternate; }
+  @keyframes tick { from{color:var(--gray-900)} to{color:var(--purple)} }
 </style>
 </head>
 <body>
 
-<!-- WORKER SELECT OVERLAY -->
+<!-- WORKER OVERLAY -->
 <div class="worker-overlay" id="worker-overlay">
   <div class="worker-picker">
     <div class="wp-title">Varroda Belépés</div>
     <div class="wp-sub">Válaszd ki a nevedet</div>
-    <div class="wp-list" id="worker-list">
-      <div class="loading-msg">Varrónők betöltése...</div>
-    </div>
+    <div class="wp-list" id="worker-list"><div style="color:var(--gray-400);font-size:12px">Betöltés...</div></div>
   </div>
 </div>
 
@@ -414,26 +411,43 @@
   <div class="header-worker">
     <div>
       <div class="worker-nm" id="header-worker-name">–</div>
-      <div class="worker-rl" id="header-worker-role">Varrónő</div>
+      <div class="worker-rl">Varrónő</div>
     </div>
-    <div class="worker-av" id="header-worker-av" onclick="showWorkerPicker()" title="Varrónő váltás">–</div>
+    <div class="worker-av" id="header-worker-av" onclick="showWorkerPicker()">–</div>
   </div>
 </div>
 
 <!-- CONTENT -->
 <div class="content">
-
   <div class="center">
 
     <!-- COL 1: Termék -->
     <div class="card">
       <div class="card-lbl">Termék</div>
-      <div class="product-main active" id="prod-icon">👗</div>
-      <div class="product-name" id="prod-name">–</div>
-      <div class="product-code" id="prod-code">–</div>
-      <select class="prod-select" id="prod-op-select" onchange="onProdOpChange(this.value)">
-        <option>Betöltés...</option>
-      </select>
+      <div class="product-img">
+        <img id="prod-img" src="https://vivienvance.prodyflow.com/storage/product/1095/K%C3%A9p%209.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👗'" alt="M-22">
+      </div>
+      <div class="product-serial" style="font-size:22px;margin-top:8px;">M-22</div>
+
+      <div class="color-label">Szín / Gyártás</div>
+      <div class="color-btns">
+        <button class="color-btn active" id="btn-black" onclick="selectColor('black')">
+          <span class="color-dot" style="background:#1a1a1a;border:1px solid #ccc"></span>
+          Fekete
+        </button>
+        <button class="color-btn" id="btn-red" onclick="selectColor('red')">
+          <span class="color-dot" style="background:#EF4444"></span>
+          Piros
+        </button>
+      </div>
+
+      <div class="size-badges" id="size-badges">
+        <span class="size-badge highlight">XS</span>
+        <span class="size-badge highlight">S</span>
+        <span class="size-badge highlight">M</span>
+        <span class="size-badge highlight">L</span>
+        <span class="size-badge highlight">XL</span>
+      </div>
     </div>
 
     <!-- COL 2: Műveleti adatok -->
@@ -446,49 +460,62 @@
         </div>
         <div>
           <div class="op-title" id="op-title">Betöltés...</div>
-          <div class="op-model" id="op-model">–</div>
+          <div class="op-sub" id="op-sub">M-22 · Push-up Triangle Bikini Top</div>
         </div>
       </div>
-      <div class="op-desc" id="op-desc">–</div>
-      <div class="mat-section">
-        <div class="mat-lbl">Gyártás</div>
-        <div class="mat-list" id="mat-list">
-          <div class="mat-item"><div class="mat-item-icon">⏳</div>Betöltés...</div>
+      <div class="op-desc-wrap">
+        <div class="op-desc-row" id="desc-row-main" style="display:none">
+          <div class="op-desc-tag">Leírás</div>
+          <div class="op-desc-text main" id="op-desc-main">–</div>
         </div>
+        <div id="desc-empty" style="font-size:13px;color:var(--gray-400);font-style:italic">Nincs leírás</div>
+        <div id="materials-section" style="display:none;margin-top:10px;">
+          <div class="op-desc-tag" style="margin-bottom:6px;">Alapanyagok</div>
+          <div id="materials-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-pill purple">
+          <span class="pv" id="op-time">–</span>
+          <span class="pl">mp/db</span>
+        </div>
+        <div class="info-pill orange">
+          <span class="pv" id="op-qty">–</span>
+          <span class="pl">Darab</span>
+        </div>
+      </div>
+      <div class="video-indicator no-video" id="video-indicator">
+        ▶ Nincs videó ehhez a művelethez
       </div>
     </div>
 
     <!-- COL 3: Idők & Méretek -->
     <div class="card">
       <div class="card-lbl">Idők &amp; Méretek</div>
-
-      <div class="stat-group">
-        <div class="stat-big">
-          <span class="stat-val" id="time-val">–</span>
-          <span class="stat-unit">mp/db</span>
+      <div class="stat-group" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px;">Műveleti idő</div>
+          <div style="font-size:26px;font-weight:900;color:var(--purple);line-height:1;">
+            <span id="time-val">–</span>
+            <span style="font-size:12px;font-weight:700;color:var(--purple);opacity:.7">mp/db</span>
+          </div>
         </div>
-        <div class="stat-lbl">Művelet idő</div>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-pill orange">
-          <span class="pv" id="qty-total">–</span>
-          <span class="pl">Darab</span>
-        </div>
-        <div class="stat-pill green">
-          <span class="pv" id="qty-done">0</span>
-          <span class="pl">Kész</span>
+        <div style="text-align:right;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px;">Cél idő</div>
+          <div style="font-size:26px;font-weight:900;color:var(--purple);line-height:1;" id="target-time">–</div>
         </div>
       </div>
-
-      <div style="font-size:11px;color:var(--gray-500);margin-bottom:8px;flex-shrink:0;">
-        <span style="font-weight:700;color:var(--gray-700)">Cél idő:</span>
-        <span id="target-time">–</span>
+      <div style="margin-top:8px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px;">Darabszám</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" id="custom-qty" min="1" value="160"
+            style="width:90px;font-size:22px;font-weight:900;color:var(--orange);border:2px solid #FED7AA;border-radius:8px;padding:4px 8px;background:var(--orange-light);text-align:center;"
+            oninput="recalcTarget()" />
+          <span style="font-size:11px;color:var(--gray-400);font-weight:600;">db</span>
+        </div>
       </div>
-
       <div class="divider"></div>
-
-      <div class="card-lbl" style="margin-bottom:6px">Variáns bontás</div>
+      <div class="card-lbl" style="margin-bottom:6px">Méret bontás</div>
       <div class="sizes-grid" id="sizes-grid">
         <div class="size-item"><span class="size-lbl">–</span><span class="size-val">–</span></div>
       </div>
@@ -497,14 +524,11 @@
     <!-- COL 4: Videó -->
     <div class="card">
       <div class="card-lbl">Videó útmutató</div>
-      <div class="video-wrap">
-        <div class="play-btn">▶</div>
-        <div class="video-lbl" id="video-lbl">–</div>
-      </div>
-      <div class="thumb-row">
-        <div class="thumb active">👗</div>
-        <div class="thumb">📸</div>
-        <div class="thumb">🖼</div>
+      <div class="video-wrap" id="video-wrap">
+        <div class="no-video-wrap">
+          <div class="icon">🎬</div>
+          <div class="txt">Nincs videó</div>
+        </div>
       </div>
     </div>
 
@@ -513,54 +537,62 @@
   <!-- RIGHT PANEL -->
   <div class="right-panel">
     <div class="action-card">
-
-      <button class="start-btn" id="start-btn" onclick="toggleTimer()">
-        ▶ Termelés indítása
-      </button>
-
+      <button class="start-btn" id="start-btn" onclick="toggleTimer()">▶ Termelés indítása</button>
       <div class="timer-box">
         <div class="timer-lbl">Eltelt idő</div>
         <div class="timer-val" id="timer">00:00:00</div>
         <div class="timer-target">Cél: <strong id="target-time-btn">–</strong></div>
       </div>
-
       <div class="spacer"></div>
-
       <button class="problem-btn">⚠ Időprobléma</button>
-
     </div>
   </div>
-
-</div><!-- /content -->
+</div>
 
 <!-- FOOTER NAV -->
 <div class="footer-nav">
   <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Előző</button>
-  <div class="progress-dots" id="progress-dots"></div>
+  <div class="progress-center">
+    <div class="progress-dots" id="progress-dots"></div>
+    <div class="op-counter" id="op-counter">–</div>
+  </div>
   <button class="nav-btn" id="btn-next" onclick="navigate(1)">Következő →</button>
 </div>
 
 <script>
-  const API = 'http://srv1478417.hstgr.cloud:5050';
+  const API = '';
+  const PRODUCT_ID = 1095;
+  const IMG_BASE = 'https://vivienvance.prodyflow.com/storage/';
 
-  // State
+  // Color → production op ID + qty
+  const COLORS = {
+    black: { prodOpId: 10136, label: 'Fekete – Black APS Bikini', qty: 160,
+             sizes: { XS: 32, S: 32, M: 32, L: 32, XL: 32 } },
+    red:   { prodOpId: 10137, label: 'Piros – Shanghai APS Bikini', qty: 136,
+             sizes: { XS: 24, S: 28, M: 32, L: 28, XL: 24 } },
+  };
+
   let workers = [];
   let currentWorker = null;
-  let currentProdOp = null;
   let mfgOps = [];
   let currentOpIndex = 0;
-
-  // Timer
+  let selectedColor = 'black';
   let running = false, secs = 0, iv = null;
 
-  // ── Init ──────────────────────────────────────
   async function init() {
-    // Date header
     const d = new Date();
     document.getElementById('header-date').textContent =
       'Ma: ' + d.toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'});
 
-    // Load workers
+    // Termék kép betöltése API-ból
+    try {
+      const imgRes = await fetch(`${API}/api/product/${PRODUCT_ID}/images`);
+      const imgs = await imgRes.json();
+      if (imgs && imgs.length > 0) {
+        document.getElementById('prod-img').src = imgs[0].url;
+      }
+    } catch(e) { /* fallback marad */ }
+
     try {
       const res = await fetch(`${API}/api/workers`);
       workers = await res.json();
@@ -570,185 +602,152 @@
       return;
     }
 
-    // Check URL params
     const params = new URLSearchParams(location.search);
     const wid = params.get('worker_id');
     if (wid) {
       const w = workers.find(x => x.id == wid);
       if (w) { selectWorker(w); return; }
     }
-
-    // Show picker
     renderWorkerPicker();
   }
 
   function renderWorkerPicker() {
-    const colors = ['#7C3AED','#F97316','#22C55E','#EF4444','#EC4899','#8B5CF6','#0EA5E9','#14B8A6','#F59E0B'];
+    const colors = ['#7C3AED','#F97316','#22C55E','#EF4444','#EC4899','#8B5CF6','#0EA5E9','#14B8A6'];
     const html = workers.map((w, i) => `
       <div class="wp-item" onclick="selectWorker(workers[${i}])">
         <div class="wp-av" style="background:${colors[i % colors.length]}">${w.initials}</div>
         <div class="wp-nm">${w.name}</div>
       </div>`).join('');
-    document.getElementById('worker-list').innerHTML = html || '<div style="color:var(--gray-400)">Nincs varrónő</div>';
+    document.getElementById('worker-list').innerHTML = html;
     document.getElementById('worker-overlay').classList.remove('hidden');
   }
 
-  function showWorkerPicker() {
-    renderWorkerPicker();
-  }
+  function showWorkerPicker() { renderWorkerPicker(); }
 
   async function selectWorker(w) {
     currentWorker = w;
     document.getElementById('worker-overlay').classList.add('hidden');
-
-    const colors = ['#7C3AED','#F97316','#22C55E','#EF4444','#EC4899','#8B5CF6','#0EA5E9','#14B8A6','#F59E0B'];
+    const colors = ['#7C3AED','#F97316','#22C55E','#EF4444','#EC4899','#8B5CF6','#0EA5E9','#14B8A6'];
     const i = workers.indexOf(w);
     document.getElementById('header-worker-name').textContent = w.name;
     document.getElementById('header-worker-av').textContent = w.initials;
     document.getElementById('header-worker-av').style.background = colors[i % colors.length];
-
-    // Load production ops
-    await loadProdOps();
+    await loadOps();
   }
 
-  async function loadProdOps() {
-    if (!currentWorker) return;
-
-    // Get active production ops
-    let ops = [];
+  async function loadOps() {
     try {
-      const res = await fetch(`${API}/api/production-ops`);
-      ops = await res.json();
-    } catch(e) { return; }
-
-    // Populate select
-    const sel = document.getElementById('prod-op-select');
-    if (!ops.length) {
-      sel.innerHTML = '<option>Nincs aktív gyártás</option>';
-      return;
+      const res = await fetch(`${API}/api/production-ops/${COLORS[selectedColor].prodOpId}`);
+      const data = await res.json();
+      mfgOps = (data.manufacturing_ops || []).filter(o => o.product_id === PRODUCT_ID);
+    } catch(e) {
+      mfgOps = [];
     }
-    sel.innerHTML = ops.map(op =>
-      `<option value="${op.id}">${op.title}</option>`
-    ).join('');
-
-    // Load first op
-    await loadProdOpDetail(ops[0].id);
-  }
-
-  async function onProdOpChange(id) {
-    if (!id) return;
-    await loadProdOpDetail(parseInt(id));
-  }
-
-  async function loadProdOpDetail(opId) {
-    let data;
-    try {
-      const res = await fetch(`${API}/api/production-ops/${opId}`);
-      data = await res.json();
-    } catch(e) { return; }
-
-    currentProdOp = data;
-
-    // Get this worker's manufacturing ops that match the production op's ops
-    let workerOps = [];
-    try {
-      const res = await fetch(`${API}/api/workers/${currentWorker.id}/ops`);
-      workerOps = await res.json();
-    } catch(e) { workerOps = []; }
-
-    // Filter: show worker's ops that appear in this production op
-    const prodMoIds = new Set(data.manufacturing_ops.map(m => m.id));
-    mfgOps = workerOps.filter(op => prodMoIds.has(op.id));
-
-    // Fallback: if no intersection, show worker's ops anyway
-    if (!mfgOps.length) {
-      mfgOps = workerOps.length ? workerOps : data.manufacturing_ops;
-    }
-
     currentOpIndex = 0;
+    resetTimer();
     renderOp();
   }
 
-  function renderOp() {
-    if (!currentProdOp) return;
+  function selectColor(color) {
+    selectedColor = color;
+    document.getElementById('btn-black').classList.toggle('active', color === 'black');
+    document.getElementById('btn-red').classList.toggle('active', color === 'red');
+    document.getElementById('custom-qty').value = COLORS[color].qty;
 
+    // Update size badges
+    const sizes = COLORS[color].sizes;
+    const SLABELS = ['XS','S','M','L','XL'];
+    document.getElementById('size-badges').innerHTML =
+      SLABELS.map(s => `<span class="size-badge highlight">${s}</span>`).join('');
+
+    if (currentWorker) loadOps();
+  }
+
+  function recalcTarget() {
+    const qty = parseInt(document.getElementById('custom-qty').value) || 0;
     const op = mfgOps[currentOpIndex];
+    const timeSec = op ? (op.time_sec || 0) : 0;
+    const targetMin = timeSec && qty ? Math.round(timeSec * qty / 60) : 0;
+    const targetStr = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p` : '–';
+    document.getElementById('target-time').textContent = targetStr;
+    document.getElementById('target-time-btn').textContent = targetStr;
+  }
 
-    // Product info
-    const prodName = currentProdOp.items.length > 0
-      ? (currentProdOp.items[0].product_name || currentProdOp.title)
-      : currentProdOp.title;
-    document.getElementById('prod-name').textContent = currentProdOp.title;
-    document.getElementById('prod-code').textContent = prodName;
-    document.getElementById('prod-icon').textContent = '👗';
+  function renderOp() {
+    if (!mfgOps.length) return;
+    const op = mfgOps[currentOpIndex];
+    const color = COLORS[selectedColor];
 
-    if (op) {
-      // Find full op details from production op
-      const fullOp = currentProdOp.manufacturing_ops.find(m => m.id === op.id);
+    document.getElementById('op-num').textContent = currentOpIndex + 1;
+    document.getElementById('op-title').textContent = op.name;
+    document.getElementById('op-sub').textContent = `M-22 · Op ${currentOpIndex + 1} / ${mfgOps.length}`;
+    const desc = op.description || '';
+    document.getElementById('desc-row-main').style.display = desc ? '' : 'none';
+    document.getElementById('desc-empty').style.display = desc ? 'none' : '';
+    document.getElementById('op-desc-main').textContent = desc;
 
-      document.getElementById('op-num').textContent = currentOpIndex + 1;
-      document.getElementById('op-title').textContent = op.name;
-      document.getElementById('op-model').textContent = `${currentProdOp.title} / Op ${currentOpIndex + 1}`;
-      document.getElementById('op-desc').textContent = op.description || fullOp?.description || '–';
-      document.getElementById('video-lbl').textContent = `Op ${currentOpIndex + 1} · ${op.name}`;
+    const timeSec = op.time_sec || 0;
+    document.getElementById('op-time').textContent = timeSec || '–';
+    document.getElementById('time-val').textContent = timeSec || '–';
+    document.getElementById('op-qty').textContent = color.qty;
 
-      const timeSec = fullOp?.time_sec || 0;
-      document.getElementById('time-val').textContent = timeSec || '–';
+    const customQty = parseInt(document.getElementById('custom-qty').value) || color.qty;
+    const targetMin = timeSec && customQty ? Math.round(timeSec * customQty / 60) : 0;
+    const targetStr = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p` : '–';
+    document.getElementById('target-time').textContent = targetStr;
+    document.getElementById('target-time-btn').textContent = targetStr;
 
-      const totalQty = currentProdOp.total_qty;
-      const targetMin = timeSec && totalQty ? Math.round(timeSec * totalQty / 60) : 0;
-      const targetStr = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p / ${targetMin}p` : '–';
-      document.getElementById('target-time').textContent = targetStr;
-      document.getElementById('target-time-btn').textContent = targetMin ? `${Math.floor(targetMin/60)}ó ${targetMin%60}p` : '–';
-
-      // Mat list
-      document.getElementById('mat-list').innerHTML = `
-        <div class="mat-item"><div class="mat-item-icon">🏭</div>${currentProdOp.title}</div>
-        <div class="mat-item"><div class="mat-item-icon">📦</div>${totalQty} db összesen</div>
-      `;
+    // Alapanyagok
+    const materials = op.materials || [];
+    const matSection = document.getElementById('materials-section');
+    const matList = document.getElementById('materials-list');
+    if (materials.length > 0) {
+      matSection.style.display = '';
+      matList.innerHTML = materials.map(m => `
+        <div class="material-item">
+          ${m.image_url
+            ? `<img class="material-img" src="${m.image_url}" onerror="this.style.display='none'" alt="${m.name}">`
+            : `<div class="material-img" style="display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>`}
+          <div>
+            <div class="material-name">${m.name || '–'}</div>
+            ${m.amount ? `<div class="material-amt">${m.amount} db</div>` : ''}
+          </div>
+        </div>`).join('');
     } else {
-      document.getElementById('op-num').textContent = '–';
-      document.getElementById('op-title').textContent = 'Nincs hozzárendelt művelet';
-      document.getElementById('op-model').textContent = currentProdOp.title;
-      document.getElementById('op-desc').textContent = 'Ehhez a gyártáshoz nincs hozzárendelt műveleted.';
-      document.getElementById('time-val').textContent = '–';
-      document.getElementById('target-time').textContent = '–';
-      document.getElementById('target-time-btn').textContent = '–';
-      document.getElementById('mat-list').innerHTML =
-        `<div class="mat-item"><div class="mat-item-icon">🏭</div>${currentProdOp.title}</div>`;
+      matSection.style.display = 'none';
     }
 
-    // Quantities
-    document.getElementById('qty-total').textContent = currentProdOp.total_qty;
-    document.getElementById('qty-done').textContent =
-      currentProdOp.items.reduce((s, i) => s + (i.done_in || 0), 0) || '0';
-
-    // Size grid
-    const sizes = currentProdOp.size_totals || {};
-    const entries = Object.entries(sizes);
-    const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-    let sizeHtml = '';
-    if (entries.length > 0) {
-      entries.forEach(([label, qty], i) => {
-        // Use standard size labels if value looks like a full characteristics string
-        const displayLabel = label.length > 10 ? (SIZES[i] || `V${i+1}`) : label;
-        sizeHtml += `<div class="size-item">
-          <span class="size-lbl">${displayLabel}</span>
-          <span class="size-val">${qty}</span>
-        </div>`;
-      });
+    // Videó
+    const driveId = op.video_drive_id;
+    const videoWrap = document.getElementById('video-wrap');
+    const indicator = document.getElementById('video-indicator');
+    if (driveId) {
+      videoWrap.innerHTML = `<iframe
+        src="https://drive.google.com/file/d/${driveId}/preview?autoplay=1"
+        style="width:100%;height:100%;border:none;border-radius:10px;"
+        allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+      indicator.className = 'video-indicator has-video';
+      indicator.textContent = '▶ Videó elérhető';
     } else {
-      sizeHtml = `<div class="size-item"><span class="size-lbl">–</span><span class="size-val">–</span></div>`;
+      videoWrap.innerHTML = `<div class="no-video-wrap"><div class="icon">🎬</div><div class="txt">Nincs videó</div></div>`;
+      indicator.className = 'video-indicator no-video';
+      indicator.textContent = '▶ Nincs videó ehhez a művelethez';
     }
-    document.getElementById('sizes-grid').innerHTML = sizeHtml;
 
-    // Progress dots
-    const dots = document.getElementById('progress-dots');
-    dots.innerHTML = mfgOps.map((_, i) =>
-      `<div class="dot ${i < currentOpIndex ? 'done' : i === currentOpIndex ? 'active' : ''}"></div>`
-    ).join('');
+    // Méretek
+    const sizes = color.sizes;
+    document.getElementById('sizes-grid').innerHTML =
+      Object.entries(sizes).map(([s, q]) =>
+        `<div class="size-item"><span class="size-lbl">${s}</span><span class="size-val">${q}</span></div>`
+      ).join('');
 
-    // Nav buttons
+    // Progress
+    document.getElementById('progress-dots').innerHTML =
+      mfgOps.map((_, i) =>
+        `<div class="dot ${i < currentOpIndex ? 'done' : i === currentOpIndex ? 'active' : ''}"></div>`
+      ).join('');
+    document.getElementById('op-counter').textContent = `${currentOpIndex + 1} / ${mfgOps.length} művelet`;
+
     document.getElementById('btn-prev').disabled = currentOpIndex === 0;
     document.getElementById('btn-next').disabled = currentOpIndex >= mfgOps.length - 1;
   }
@@ -757,10 +756,7 @@
     const next = currentOpIndex + dir;
     if (next < 0 || next >= mfgOps.length) return;
     currentOpIndex = next;
-    // Reset timer
-    if (running) toggleTimer();
-    secs = 0;
-    document.getElementById('timer').textContent = '00:00:00';
+    resetTimer();
     renderOp();
   }
 
@@ -785,6 +781,14 @@
       clearInterval(iv);
       disp.classList.remove('timer-running');
     }
+  }
+
+  function resetTimer() {
+    if (running) toggleTimer();
+    secs = 0;
+    document.getElementById('timer').textContent = '00:00:00';
+    document.getElementById('start-btn').innerHTML = '▶ Termelés indítása';
+    document.getElementById('start-btn').classList.remove('running');
   }
 
   init();

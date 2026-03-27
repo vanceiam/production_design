@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pymysql
 import pymysql.cursors
+from urllib.parse import quote
 
 app = Flask(__name__)
 CORS(app)
@@ -112,14 +113,28 @@ def get_production_ops():
     conn = get_conn()
     try:
         cur = conn.cursor()
-        cur.execute('''
-            SELECT wo.id, wo.title, wo.status, wo.created_at, wo.deadline_date, wo.pretty_id
-            FROM warehouse_operations wo
-            WHERE wo.operation_type = 6
-              AND (wo.status != -2 OR wo.status IS NULL)
-            ORDER BY wo.created_at DESC
-            LIMIT 50
-        ''')
+        include_ids = request.args.get('include_ids', '')
+        extra_ids = [int(x) for x in include_ids.split(',') if x.strip().isdigit()]
+
+        if extra_ids:
+            placeholders = ','.join(['%s'] * len(extra_ids))
+            cur.execute(f'''
+                SELECT wo.id, wo.title, wo.status, wo.created_at, wo.deadline_date, wo.pretty_id
+                FROM warehouse_operations wo
+                WHERE wo.operation_type = 6
+                  AND ((wo.status != -2 OR wo.status IS NULL) OR wo.id IN ({placeholders}))
+                ORDER BY wo.created_at DESC
+                LIMIT 50
+            ''', extra_ids)
+        else:
+            cur.execute('''
+                SELECT wo.id, wo.title, wo.status, wo.created_at, wo.deadline_date, wo.pretty_id
+                FROM warehouse_operations wo
+                WHERE wo.operation_type = 6
+                  AND (wo.status != -2 OR wo.status IS NULL)
+                ORDER BY wo.created_at DESC
+                LIMIT 50
+            ''')
         ops = []
         for r in cur.fetchall():
             ops.append({
@@ -251,10 +266,13 @@ def get_production_op(op_id):
             placeholders = ','.join(['%s'] * len(product_ids))
             cur.execute(f'''
                 SELECT
-                    pmo.id, pmo.product_id, pmo.order, pmo.time, pmo.description, pmo.type,
-                    mo.id as mo_id, mo.name as op_name, mo.sort_description
+                    pmo.id, pmo.product_id, pmo.order, pmo.time, pmo.description as pmo_description, pmo.type,
+                    mo.id as mo_id, mo.name as op_name, mo.sort_description,
+                    v.path as video_path, v.name as video_name
                 FROM product_manufacturing_operations pmo
                 JOIN manufacturing_operations mo ON mo.id = pmo.manufacturing_operation_id
+                LEFT JOIN product_manufacturing_operation_videos pmov ON pmov.product_manufacturing_operation_id = pmo.id
+                LEFT JOIN videos v ON v.id = pmov.video_id
                 WHERE pmo.product_id IN ({placeholders})
                   AND (pmo.is_hidden != 1 OR pmo.is_hidden IS NULL)
                 ORDER BY pmo.product_id, pmo.order
@@ -262,7 +280,7 @@ def get_production_op(op_id):
             mfg_ops = []
             seen = set()
             for r in cur.fetchall():
-                key = (r['mo_id'], r['product_id'])
+                key = r['id']
                 if key not in seen:
                     seen.add(key)
                     mfg_ops.append({
@@ -271,12 +289,78 @@ def get_production_op(op_id):
                         'product_id': r['product_id'],
                         'order': r['order'],
                         'name': r['op_name'],
-                        'description': r['sort_description'] or r['description'],
+                        'description': r['pmo_description'],
+                        'sort_description': r['sort_description'],
                         'time_sec': r['time'],
                         'type': r['type'],
+                        'video_drive_id': r['video_path'] if r['video_path'] else None,
+                        'video_name': r['video_name'] if r['video_name'] else None,
                     })
         else:
             mfg_ops = []
+
+        # Materials per pmo
+        if mfg_ops:
+            pmo_ids = [op['pmo_id'] for op in mfg_ops]
+            ph2 = ','.join(['%s'] * len(pmo_ids))
+            cur.execute(f'''
+                SELECT DISTINCT
+                    pco.product_manufacturing_operation_id as pmo_id,
+                    pv.id as material_id,
+                    pv.product_id as material_product_id,
+                    pc.amount,
+                    pt.name as material_name,
+                    (SELECT CONCAT(pi2.path, pi2.format)
+                     FROM product_images_with_paths pi2
+                     WHERE pi2.product_id = pv.product_id
+                     LIMIT 1) as image_path
+                FROM product_component_operations pco
+                JOIN product_components pc ON pc.id = pco.product_component_id
+                JOIN product_variants pv ON pv.id = pc.material_id
+                LEFT JOIN product_translations pt ON pt.product_id = pv.product_id
+                    AND pt.language_code = 'hu'
+                WHERE pco.product_manufacturing_operation_id IN ({ph2})
+            ''', pmo_ids)
+            # Fetch English names as fallback for materials without Hungarian name
+            mat_prod_ids_no_hu = set()
+            raw_materials = cur.fetchall()
+            for r in raw_materials:
+                if not r['material_name']:
+                    mat_prod_ids_no_hu.add(r['material_product_id'])
+            en_names = {}
+            if mat_prod_ids_no_hu:
+                ph3 = ','.join(['%s'] * len(mat_prod_ids_no_hu))
+                cur.execute(f'''
+                    SELECT product_id, name FROM product_translations
+                    WHERE product_id IN ({ph3}) AND language_code = 'en'
+                ''', list(mat_prod_ids_no_hu))
+                for r2 in cur.fetchall():
+                    en_names[r2['product_id']] = r2['name']
+
+            # Build materials, deduplicating by (pmo_id, material_product_id)
+            materials_by_pmo = {}
+            seen_mat = set()
+            for r in raw_materials:
+                key = (r['pmo_id'], r['material_product_id'])
+                if key in seen_mat:
+                    continue
+                seen_mat.add(key)
+                pid = r['pmo_id']
+                if pid not in materials_by_pmo:
+                    materials_by_pmo[pid] = []
+                img_url = None
+                if r['image_path']:
+                    img_url = f'https://vivienvance.prodyflow.com/storage/{quote(r["image_path"], safe="/")}'
+                name = r['material_name'] or en_names.get(r['material_product_id'])
+                materials_by_pmo[pid].append({
+                    'id': r['material_id'],
+                    'name': name,
+                    'amount': r['amount'],
+                    'product_id': r['material_product_id'],
+                    'image_url': img_url,
+                })
+            for mop in mfg_ops:
+                mop['materials'] = materials_by_pmo.get(mop['pmo_id'], [])
 
         total_qty = sum(i['quantity'] for i in items)
         return jsonify({
@@ -290,6 +374,31 @@ def get_production_op(op_id):
             'items': items,
             'manufacturing_ops': mfg_ops,
         })
+    finally:
+        conn.close()
+
+
+# ─────────────────────────────────────────────
+# GET /api/product/<id>/images
+# Termék képeinek listája
+# ─────────────────────────────────────────────
+@app.route('/api/product/<int:product_id>/images')
+def get_product_images(product_id):
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT CONCAT(path, format) as full_path
+            FROM product_images_with_paths
+            WHERE product_id = %s
+            LIMIT 5
+        ''', (product_id,))
+        images = []
+        for r in cur.fetchall():
+            fp = r['full_path']
+            if fp:
+                images.append({'url': f'https://vivienvance.prodyflow.com/storage/{quote(fp, safe="/")}'})
+        return jsonify(images)
     finally:
         conn.close()
 
